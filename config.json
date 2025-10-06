@@ -1,0 +1,13 @@
+{
+	"min_thread_pool_size": 4,
+	"max_thread_pool_size": 8,
+	"resources_root": "C:/Users/ethan/eclipse_stuff/CubeStatsWeb/res",
+	"hostname": "127.0.0.1",
+	"networking": {
+		"http": {
+			"port": 80,
+			"http/1.1": true,
+			"http/2": true
+		}
+	}
+}
