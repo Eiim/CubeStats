@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import page.eiim.cubestats.DatabaseCSN;
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskNemesize extends Task {
 	
-	public TaskNemesize(TaskSettings settings) {
+	public TaskNemesize(Settings settings) {
 		super(settings);
 	}
 	
@@ -53,7 +53,7 @@ public class TaskNemesize extends Task {
 				
 				if(!person.equals(currentPerson)) {
 					if(!currentPerson.isEmpty()) {
-						categoryMap.computeIfAbsent(currentFlag, i -> new ArrayList<>());
+						categoryMap.computeIfAbsent(currentFlag, _ -> new ArrayList<>());
 						categoryMap.get(currentFlag).add(currentPerson);
 					}
 					currentPerson = person;

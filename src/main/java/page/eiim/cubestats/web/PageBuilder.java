@@ -21,10 +21,9 @@ public class PageBuilder {
 			<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 			<script src="/main.js"></script>""";
 	
-	public static void setup(String resourcesRoot) {
-		File resDir = new File(resourcesRoot);
+	public static void setup(File resourcesRoot) {
 		
-		try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(resDir, "index.html")))) {
+		try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(resourcesRoot, "index.html")))) {
 			writer.write(new Instance()
 					.buildHead("CubeStats", "Some statistical analysis of WCA cubing results: under construction", false)
 					.addSidebar()
@@ -38,7 +37,7 @@ public class PageBuilder {
 			e.printStackTrace();
 		}
 		
-		File postsDir = new File(resDir, "posts/");
+		File postsDir = new File(resourcesRoot, "posts/");
 		File[] postFiles = postsDir.listFiles((_, name) -> name.endsWith(".txt"));
 		BlogPost[] blogPosts;
 		if(postFiles == null) {
@@ -56,7 +55,7 @@ public class PageBuilder {
 		}
 		
 		// Create HTML for each blog post
-		File blogRoot = new File(resDir, "blog/");
+		File blogRoot = new File(resourcesRoot, "blog/");
 		blogRoot.mkdirs();
 		for(BlogPost post : blogPosts) {
 			File postFile = new File(blogRoot, post.path + ".html");

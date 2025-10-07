@@ -10,11 +10,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import page.eiim.cubestats.DatabaseCSN;
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskBayesPriors extends Task {
 	
-	public TaskBayesPriors(TaskSettings settings) {
+	public TaskBayesPriors(Settings settings) {
 		super(settings);
 	}
 	

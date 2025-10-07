@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import page.eiim.cubestats.DatabaseCSN;
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskCSEvents extends Task {
 	
-	public TaskCSEvents(TaskSettings settings) {
+	public TaskCSEvents(Settings settings) {
 		super(settings);
 	}
 	

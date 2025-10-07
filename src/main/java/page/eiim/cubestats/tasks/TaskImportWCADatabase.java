@@ -2,7 +2,7 @@ package page.eiim.cubestats.tasks;
 
 import java.io.File;
 
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskImportWCADatabase extends Task {
 
@@ -14,7 +14,7 @@ public class TaskImportWCADatabase extends Task {
 	private final String dbPassword;
 	private final String dbSchemaStaging;
 	
-	public TaskImportWCADatabase(TaskSettings settings) {
+	public TaskImportWCADatabase(Settings settings) {
 		synchronized (settings) {
 			dataDirectory = settings.dataDirectory;
 			mysqlExe = settings.mySQLExe;

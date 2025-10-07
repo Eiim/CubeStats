@@ -1,7 +1,5 @@
 package page.eiim.cubestats.web;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -21,39 +19,25 @@ import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
+import page.eiim.cubestats.Settings;
 
 public class MainServer {
-	public static void run(String[] args) {
-		// Load configuration from json file
-		String configPath = args.length > 0 ? args[0] : "config.json";
-		System.out.println("Loading configuration from " + configPath);
-		JsonObject root;
-		try (BufferedReader reader = new BufferedReader(new FileReader(configPath))) {
-			root = JsonParser.parseReader(reader).getAsJsonObject();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		int minThreadPoolSize = root.has("min_thread_pool_size") ? root.get("min_thread_pool_size").getAsInt() : 8;
-		int maxThreadPoolSize = root.has("max_thread_pool_size") ? root.get("max_thread_pool_size").getAsInt() : 200;
-		QueuedThreadPool threadPool = new QueuedThreadPool(maxThreadPoolSize, minThreadPoolSize);
+	public static void run(Settings settings, JsonObject networking) {
+		QueuedThreadPool threadPool = new QueuedThreadPool(settings.maxThreadPoolSize, settings.minThreadPoolSize);
 		threadPool.setName("serversPool");
 		
-		String resourcesRoot = root.get("resources_root").getAsString();
-		PageBuilder.setup(resourcesRoot);
+		PageBuilder.setup(settings.resourcesRoot);
 		
-		String hostname = root.get("hostname").getAsString();
+		String hostname = settings.hostname;
 		WebServerBuilder serverBuilder = new WebServerBuilder(threadPool, hostname);
 		
 		// Set up HTTP/HTTPS/QUIC
-		JsonObject networking = root.has("networking") ? root.getAsJsonObject("networking") : new JsonObject();
 		Server server = handleNetworking(networking, serverBuilder);
 		
 		// Enable request logging
 		// TODO: allow customization of logging location
-		boolean enableRequestLogging = root.has("enable_request_logging") ? root.get("enable_request_logging").getAsBoolean() : true;
-		if(enableRequestLogging) {
+		if(settings.enableRequestLogging) {
 			server.setRequestLog(new CustomRequestLog(new Slf4jRequestLogWriter(), CustomRequestLog.EXTENDED_NCSA_FORMAT));
 		}
 		
@@ -65,7 +49,7 @@ public class MainServer {
 		
 		// Handle static resources
 		ResourceHandler handler = new ResourceHandler();
-		handler.setBaseResource(ResourceFactory.of(handler).newResource(resourcesRoot));
+		handler.setBaseResource(ResourceFactory.of(handler).asResource(settings.resourcesRoot));
 		handler.setDirAllowed(false);
 		handler.setWelcomeFiles(List.of("index.html"));
 		handler.setAcceptRanges(true);

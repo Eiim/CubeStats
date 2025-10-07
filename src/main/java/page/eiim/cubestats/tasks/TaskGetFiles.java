@@ -18,7 +18,7 @@ import java.util.zip.ZipInputStream;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskGetFiles extends Task {
 
@@ -27,17 +27,14 @@ public class TaskGetFiles extends Task {
 	private final String userAgent;
 	private final File dataDirectory;
 	
-	private final TaskSettings settings;
-	
 	private static final SimpleDateFormat localMetadataDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 	
-	public TaskGetFiles(TaskSettings settings) {
+	public TaskGetFiles(Settings settings) {
 		synchronized (settings) {
 			exportMetadataUrl = settings.exportMetadataUrl;
-			exportFormatVersion = settings.exportFormatVersion;
+			exportFormatVersion = "1.0.0";
 			userAgent = settings.userAgent;
 			dataDirectory = settings.dataDirectory;
-			this.settings = settings;
 		}
 	}
 
@@ -49,7 +46,7 @@ public class TaskGetFiles extends Task {
 	@Override
 	public void run() {
 		Gson g = new Gson();
-		Date lastExportDate = settings.lastExportDate;
+		Date lastExportDate;
 		
 		try {
 			File metadataFile = new File(dataDirectory, "metadata.json");

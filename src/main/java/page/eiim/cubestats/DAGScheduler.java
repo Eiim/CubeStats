@@ -11,15 +11,12 @@ import page.eiim.cubestats.tasks.TaskResult;
 public class DAGScheduler {
 	
 	private List<Task> running;
-	private TaskSettings settings;
 	private int maxThreads;
 	private TaskDAG dag;
 	private AtomicBoolean failure = new AtomicBoolean(false);
 
-	public DAGScheduler() {
+	public DAGScheduler(Settings settings) {
 		maxThreads = Runtime.getRuntime().availableProcessors();
-		settings = new TaskSettings();
-		
 		running = Collections.synchronizedList(new ArrayList<>(maxThreads));
 		
 		dag = new TaskDAG(settings);

@@ -3,16 +3,16 @@ package page.eiim.cubestats.tasks;
 import java.time.Duration;
 import java.util.Date;
 
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public abstract class Task implements Runnable {
 	protected boolean isDone = false;
 	protected TaskResult result = null;
-	protected TaskSettings settings = null;
+	protected Settings settings = null;
 	
 	protected Task() {}
 	
-	public Task(TaskSettings settings) {
+	public Task(Settings settings) {
 		this.settings = settings;
 	}
 	

@@ -22,7 +22,7 @@ public class TaskDAG {
 
 	private final List<Node> nodes;
 	
-	public TaskDAG(TaskSettings settings) {
+	public TaskDAG(Settings settings) {
 		List<Node> roots = new ArrayList<>();
 		
 		// Test single task

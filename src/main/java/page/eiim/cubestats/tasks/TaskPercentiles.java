@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import page.eiim.cubestats.DatabaseCSN;
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskPercentiles extends Task {
 	
-	public TaskPercentiles(TaskSettings settings) {
+	public TaskPercentiles(Settings settings) {
 		super(settings);
 	}
 	

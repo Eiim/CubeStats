@@ -15,17 +15,22 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import page.eiim.cubestats.TaskSettings;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import page.eiim.cubestats.Settings;
 
 public class TaskGetDumpFiles extends Task {
 
-	private final String databaseDumpUrl;
+	private final String exportMetadataUrl;
+	private String databaseDumpUrl;
 	private final String userAgent;
 	private final File dataDirectory;
 	private final File lastDumpMetadataFile;
 	
-	public TaskGetDumpFiles(TaskSettings settings) {
+	public TaskGetDumpFiles(Settings settings) {
 		synchronized (settings) {
+			exportMetadataUrl = settings.exportMetadataUrl;
 			databaseDumpUrl = settings.databaseDumpUrl;
 			userAgent = settings.userAgent;
 			dataDirectory = settings.dataDirectory;
@@ -40,15 +45,32 @@ public class TaskGetDumpFiles extends Task {
 
 	@Override
 	public void run() {
+		// Get URL of database dump from metadata URL
+		try {
+			HttpURLConnection metadataConnection = (HttpURLConnection) new URI(exportMetadataUrl).toURL().openConnection();
+			metadataConnection.setRequestProperty("User-Agent", userAgent);
+			String jsonString = new String(metadataConnection.getInputStream().readAllBytes(), Charset.forName("UTF-8")); // Assume UTF-8 (probably will only ever be ASCII)
+			JsonObject metadata = JsonParser.parseString(jsonString).getAsJsonObject();
+			
+			databaseDumpUrl = metadata.get("developer_url").getAsString();
+			
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+			result = new TaskResult(false, e.getMessage());
+			isDone = true;
+			return;
+		}
 		System.out.println("Downloading database dump from " + databaseDumpUrl);
 		// Check if already up-to-date
 		try {
+			// HTTP HEAD request to get last modified date
 			HttpURLConnection dumpConnection = (HttpURLConnection) new URI(databaseDumpUrl).toURL().openConnection();
 			dumpConnection.setRequestProperty("User-Agent", userAgent);
 			dumpConnection.setRequestMethod("HEAD");
 			Map<String, List<String>> fields = dumpConnection.getHeaderFields();
 			String lastModified = fields.get("Last-Modified").get(0);
 			Instant lastModifiedInstant = Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModified));
+			// Check last modified date against last download date
 			if(lastDumpMetadataFile.exists()) {
 				String[] lastDumpMetadata = new String(Files.readAllBytes(lastDumpMetadataFile.toPath()), Charset.forName("UTF-8")).split("\n");
 				try {

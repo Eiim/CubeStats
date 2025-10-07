@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import page.eiim.cubestats.DatabaseCSN;
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskCleanupDatabase extends Task {
 	
 	private final String staging;
 	
-	public TaskCleanupDatabase(TaskSettings settings) {
+	public TaskCleanupDatabase(Settings settings) {
 		super(settings);
 		synchronized(settings) {
 			staging = settings.dbSchemaStaging;

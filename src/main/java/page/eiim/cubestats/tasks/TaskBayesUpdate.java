@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import page.eiim.cubestats.DatabaseCSN;
-import page.eiim.cubestats.TaskSettings;
+import page.eiim.cubestats.Settings;
 
 public class TaskBayesUpdate extends Task {
 	
 	private static final double A = 0.2;
 	private static final double B = 15;
 	
-	public TaskBayesUpdate(TaskSettings settings) {
+	public TaskBayesUpdate(Settings settings) {
 		super(settings);
 	}
 	

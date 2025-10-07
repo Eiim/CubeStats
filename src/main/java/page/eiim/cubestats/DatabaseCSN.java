@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class DatabaseCSN {
 	
-	public static Connection getConnection(TaskSettings settings, DefaultSchema schema) throws SQLException {
+	public static Connection getConnection(Settings settings, DefaultSchema schema) throws SQLException {
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", settings.dbUserName);
