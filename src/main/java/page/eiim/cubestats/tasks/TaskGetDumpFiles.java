@@ -88,6 +88,7 @@ public class TaskGetDumpFiles extends Task {
 	}
 	
 	public static boolean checkForUpdate(Settings settings) {
+		System.out.println("Checking for database dump update...");
 		// Check if already up-to-date
 		try {
 			// HTTP HEAD request to get last modified date

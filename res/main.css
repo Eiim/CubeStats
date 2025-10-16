@@ -165,6 +165,9 @@ body {
 .blog-bold {
 	font-weight: 740;
 }
+.blog-image-container {
+	text-align: center;
+}
 .blogPost p {
 	text-indent: .5em;
 	font-size: 13pt;

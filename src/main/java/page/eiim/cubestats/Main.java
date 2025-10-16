@@ -98,42 +98,18 @@ public class Main {
 		Settings settings = sb.build();
 		AtomicReference<SystemStatus> status = new AtomicReference<>(SystemStatus.NORMAL);
 		
+		boolean startedWebserver = false;
+		MainServer server = null;
 		if(!settings.noWebserver) {
 			if(networking == null) {
 				System.err.println("No networking configuration found, can't run web server");
 			} else {
-				MainServer server = new MainServer(settings, networking);
+				server = new MainServer(settings, networking);
 				server.start();
-				while(true) {
-					try {
-						switch(status.get()) {
-							case DATA_READY -> {
-								System.out.println("Shutting down web server for data transition.");
-								if(server.shutdown()) {
-									status.set(SystemStatus.SERVER_OFFLINE);
-								} else {
-									System.err.println("Failed to shut down web server, attempting to die");
-									System.exit(1);
-								}
-							}
-							case DATA_FINISHED -> {
-								System.out.println("Data import finished, restarting web server.");
-								server = new MainServer(settings, networking);
-								server.start();
-								status.set(SystemStatus.NORMAL);
-							}
-							default -> {
-								// Do nothing
-							}
-						}
-						Thread.sleep(60 * 1000); // Check for update every minute
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+				startedWebserver = true;
 			}
 		}
-
+		
 		if(!settings.noImport) {
 			Thread thread = new Thread(() -> {
 				// Check for updates hourly
@@ -164,6 +140,34 @@ public class Main {
 				}
 			});
 			thread.start();
+		}
+		
+		while(startedWebserver) { // Effectively if(startedWebserver) while(true)
+			try {
+				switch(status.get()) {
+					case DATA_READY -> {
+						System.out.println("Shutting down web server for data transition.");
+						if(server.shutdown()) {
+							status.set(SystemStatus.SERVER_OFFLINE);
+						} else {
+							System.err.println("Failed to shut down web server, attempting to die");
+							System.exit(1);
+						}
+					}
+					case DATA_FINISHED -> {
+						System.out.println("Data import finished, restarting web server.");
+						server = new MainServer(settings, networking);
+						server.start();
+						status.set(SystemStatus.NORMAL);
+					}
+					default -> {
+						// Do nothing
+					}
+				}
+				Thread.sleep(60 * 1000); // Check for update every minute
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

@@ -42,6 +42,7 @@ public class TaskMigrateDatabase extends Task {
 			}
 			
 			conn.prepareStatement("DROP SCHEMA " + staging).executeUpdate();
+			conn.prepareStatement("CREATE SCHEMA " + staging).executeUpdate();
 			
 			result = new TaskResult(true, "Finished migrating database tables");
 			isDone = true;
