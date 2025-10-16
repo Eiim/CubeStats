@@ -17,6 +17,4 @@ public class DatabaseConnector {
 		System.out.println("Connected to database");
 		return conn;
 	}
-	
-	public static enum DefaultSchema { STAGING, LIVE };
 }

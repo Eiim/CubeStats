@@ -13,12 +13,17 @@ public class WordStorage {
 	private HashMap<Integer, List<Entry>> wordStorage;
 	private StringTree stringTree;
 	
-	public WordStorage(List<String> entries) {
+	public WordStorage(List<String> entries, List<String> ids) {
+		if(entries.size() != ids.size()) {
+			throw new IllegalArgumentException("Entries and IDs must have the same length");
+		}
 		wordStorage = new HashMap<>();
 		stringTree = new StringTree();
-		for(var entryText : entries) {
+		for(int i = 0; i < entries.size(); i++) {
+			String entryText = entries.get(i);
+			String entryId = ids.get(i);
 			if(entryText.length() >= 4) {
-				Entry entry = new Entry(entryText);
+				Entry entry = new Entry(entryText, entryId);
 				stringTree.add(entry);
 				for(String word : entry.words) {
 					int wordInt = getWordInt(word);
@@ -35,30 +40,29 @@ public class WordStorage {
 	public List<String> query(String query, int maxResults) {
 		if(query.length() < 4) return List.of();
 		query = query.toLowerCase(Locale.ROOT);
-		List<String> results = new ArrayList<>();
+		List<Entry> results = new ArrayList<>();
 		
 		// Search string tree for entries starting with the query
 		stringTree.get(query, results);
 		if(results.size() > 0) {
-			List<String> resultStrings = new ArrayList<>(results.size()); // Assume few perfect matches
-			List<String> perfectMatches = new ArrayList<>();
-			for(String entry : results) {
-				if(entry.equals(query)) {
+			List<Entry> newResults = new ArrayList<>(results.size()); // Assume few perfect matches
+			List<Entry> perfectMatches = new ArrayList<>();
+			for(Entry entry : results) {
+				if(entry.fullText.equals(query)) {
 					perfectMatches.add(entry);
 				} else {
-					resultStrings.add(entry);
+					newResults.add(entry);
 				}
 			}
 			if(perfectMatches.size() >= maxResults) {
-				return perfectMatches.subList(0, maxResults);
+				return getIds(perfectMatches.subList(0, maxResults));
 			} else {
 				int remaining = maxResults - perfectMatches.size();
-				if(resultStrings.size() > remaining) {
-					resultStrings = resultStrings.subList(0, remaining);
-					perfectMatches.addAll(resultStrings);
-					return perfectMatches;
+				if(newResults.size() > remaining) {
+					perfectMatches.addAll(newResults.subList(0, remaining));
+					return getIds(perfectMatches);
 				} else {
-					perfectMatches.addAll(resultStrings);
+					perfectMatches.addAll(newResults);
 					results = perfectMatches;
 				}
 			}
@@ -66,9 +70,9 @@ public class WordStorage {
 		// Search word storage for entries containing all words in the query
 		getEntriesWithMatchingWords(query, results);
 		if(results.size() > maxResults) {
-			return results.subList(0, maxResults);
+			return getIds(results.subList(0, maxResults));
 		} else {
-			return results;
+			return getIds(results);
 		}
 	}
 	
@@ -82,7 +86,7 @@ public class WordStorage {
 		return result;
 	}
 	
-	private void getEntriesWithMatchingWords(String query, List<String> results) {
+	private void getEntriesWithMatchingWords(String query, List<Entry> results) {
 		String[] queryWords = query.split(" ");
 		int[] invQueryWordShorts = new int[queryWords.length];
 		for(int i = 0; i < queryWords.length; i++) {
@@ -109,18 +113,28 @@ public class WordStorage {
 				}
 			}
 			if(allMatch) {
-				if(!results.contains(entry.fullText)) results.add(entry.fullText);
+				if(!results.contains(entry.fullText)) results.add(entry);
 			}
 		}
+	}
+	
+	private static List<String> getIds(List<Entry> entries) {
+		List<String> ids = new ArrayList<>(entries.size());
+		for(Entry entry : entries) {
+			ids.add(entry.id);
+		}
+		return ids;
 	}
 	
 	private class Entry {
 		public String[] words;
 		public String fullText;
+		public String id;
 		
-		public Entry(String fullText) {
+		public Entry(String fullText, String id) {
 			this.fullText = fullText.toLowerCase(Locale.ROOT);
 			words = this.fullText.split(" ");
+			this.id = id;
 		}
 	}
 	
@@ -148,7 +162,7 @@ public class WordStorage {
 			level4.get(c4).add(entry);
 		}
 		
-		public void get(String query, List<String> results) {
+		public void get(String query, List<Entry> results) {
 			char c1 = query.charAt(0);
 			char c2 = query.charAt(1);
 			char c3 = query.charAt(2);
@@ -163,7 +177,7 @@ public class WordStorage {
 			if(entries == null) return;
 			for(var entry : entries) {
 				if(entry.fullText.startsWith(query)) {
-					results.add(entry.fullText);
+					results.add(entry);
 				}
 			}
 		}

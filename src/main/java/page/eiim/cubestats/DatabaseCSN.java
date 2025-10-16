@@ -19,7 +19,7 @@ public class DatabaseCSN {
 		connectionProps.put("password", settings.dbPassword);
 		//connectionProps.put("connectionCollation", "utf8mb4_unicode_ci");
 		String dbUrl = switch(schema) {
-			case STAGING -> settings.dbUrlSatging;
+			case STAGING -> settings.dbUrlStaging;
 			case LIVE -> settings.dbUrlLive;
 		};
 

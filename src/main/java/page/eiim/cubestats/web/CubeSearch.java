@@ -1,27 +1,28 @@
 package page.eiim.cubestats.web;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeSet;
 
 public class CubeSearch {
 
-	private HashSet<String> eventIds;
-	private HashSet<String> competitionIds;
-	private HashSet<WCAId> personIds;
-	private WordStorage wordStorage;
-	private Connection conn;
+	private TreeSet<String> eventIds;
+	private TreeSet<String> competitionIds;
+	private TreeSet<WCAId> personIds;
+	private WordStorage wordStoragePersons;
+	private WordStorage wordStorageCompetitions;
 	
 	public CubeSearch(Connection conn) throws SQLException {
-		this.conn = conn;
-		eventIds = new HashSet<>();
-		competitionIds = new HashSet<>();
-		personIds = new HashSet<>();
-		List<String> personCompNames = new ArrayList<>();
+		eventIds = new TreeSet<>();
+		competitionIds = new TreeSet<>();
+		personIds = new TreeSet<>();
+		List<String> personNames = new ArrayList<>();
+		List<String> competitionNames = new ArrayList<>();
+		List<String> personIdsList = new ArrayList<>();
+		List<String> competitionIdsList = new ArrayList<>();
 		
 		var stmt = conn.createStatement();
 		var rs = stmt.executeQuery("SELECT id FROM Events");
@@ -35,7 +36,8 @@ public class CubeSearch {
 		rs = stmt.executeQuery("SELECT id, name FROM Competitions");
 		while(rs.next()) {
 			competitionIds.add(rs.getString(1).toLowerCase(Locale.ROOT));
-			personCompNames.add(rs.getString(2).toLowerCase(Locale.ROOT));
+			competitionIdsList.add(rs.getString(1).toLowerCase(Locale.ROOT));
+			competitionNames.add(rs.getString(2).toLowerCase(Locale.ROOT));
 		}
 		rs.close();
 		stmt.close();
@@ -44,82 +46,113 @@ public class CubeSearch {
 		rs = stmt.executeQuery("SELECT wca_id, name FROM Persons");
 		while(rs.next()) {
 			personIds.add(new WCAId(rs.getString(1)));
-			personCompNames.add(rs.getString(2).toLowerCase(Locale.ROOT));
+			personIdsList.add(rs.getString(1).toLowerCase(Locale.ROOT));
+			personNames.add(rs.getString(2).toLowerCase(Locale.ROOT));
 		}
 		rs.close();
 		stmt.close();
 		
-		wordStorage = new WordStorage(personCompNames);
+		wordStoragePersons = new WordStorage(personNames, personIdsList);
+		wordStorageCompetitions = new WordStorage(competitionNames, competitionIdsList);
 	}
 	
 	public List<QueryResult> query(String query, int maxResults) {
+		return query(query, maxResults, true, true, true);
+	}
+	
+	public List<QueryResult> query(String query, int maxResults, boolean includePersons, boolean includeCompetitions, boolean includeEvents) {
 		query = query.toLowerCase(Locale.ROOT);
-		if(eventIds.contains(query)) {
-			return List.of(new QueryResult(query, ResultType.EVENT));
-		} else if(query.length() == 10 && personIds.contains(new WCAId(query))) {
-			return List.of(new QueryResult(query, ResultType.PERSON));
-		} else if(competitionIds.contains(query)) {
-			return List.of(new QueryResult(query, ResultType.COMPETITION));
-		} else {
-			List<String> results = wordStorage.query(query.toLowerCase(Locale.ROOT), maxResults);
-			if(results.size() == 0) return List.of();
-			List<QueryResult> queryResults = new ArrayList<>(results.size());
-			// Query database to determine if result is a person or competition and get corresponding id
-			try {
-				PreparedStatement ps1 = conn.prepareStatement("SELECT id FROM competitions WHERE name = ?");
-				PreparedStatement ps2 = conn.prepareStatement("SELECT wca_id FROM persons WHERE name = ?");
-				for(String result : results) {
-					ps1.setString(1, result);
-					var rs = ps1.executeQuery();
-					if(rs.next()) {
-						queryResults.add(new QueryResult(rs.getString(1), ResultType.COMPETITION));
-						rs.close();
-						continue;
-					}
-					rs.close();
-					
-					ps2.setString(1, result);
-					rs = ps2.executeQuery();
-					if(rs.next()) {
-						queryResults.add(new QueryResult(rs.getString(1), ResultType.PERSON));
-						rs.close();
-						continue;
-					}
-					rs.close();
-				}
-				ps1.close();
-				ps2.close();
-				return queryResults;
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return List.of();
+		List<QueryResult> queryResults = new ArrayList<>(maxResults);
+		
+		// Exact ID matches
+		if(includeEvents && eventIds.contains(query)) {
+			queryResults.add(new QueryResult(query, ResultType.EVENT));
+		}
+		if(includePersons && WCAId.isValid(query) && personIds.contains(new WCAId(query))) {
+			queryResults.add(new QueryResult(query.toUpperCase(), ResultType.PERSON));
+		}
+		if(includeCompetitions && competitionIds.contains(query)) {
+			queryResults.add(new QueryResult(query, ResultType.COMPETITION));
+		}
+		if(queryResults.size() >= maxResults) return queryResults.subList(0, maxResults); // Likely don't need sublist, but just in case
+		
+		// Look for ID prefix matches
+		if(includeEvents) {
+			String higherId = eventIds.higher(query);
+			while(queryResults.size() < maxResults && higherId != null && higherId.startsWith(query)) {
+				queryResults.add(new QueryResult(higherId, ResultType.EVENT));
+				higherId = eventIds.higher(higherId);
 			}
+			
+		}
+		
+		if(includeCompetitions) {
+			String higherId = competitionIds.higher(query);
+			while(queryResults.size() < maxResults && higherId != null && higherId.startsWith(query)) {
+				queryResults.add(new QueryResult(higherId, ResultType.COMPETITION));
+				higherId = competitionIds.higher(higherId);
+			}
+		}
+		
+		if(includePersons && query.length() <= 10) {
+			try {
+				WCAId higherWcaId = personIds.ceiling(WCAId.minPrefix(query));
+				while(queryResults.size() < maxResults && higherWcaId != null && higherWcaId.toString().startsWith(query)) {
+					queryResults.add(new QueryResult(higherWcaId.toString(), ResultType.PERSON));
+					higherWcaId = personIds.higher(higherWcaId);
+				}
+			} catch(Exception e) {
+				// Probably an invalid WCA ID prefix, ignore
+			}
+		}
+		
+		if(includePersons && queryResults.size() < maxResults) {
+			List<String> personResults = wordStoragePersons.query(query, maxResults - queryResults.size());
+			for(String personResult : personResults) {
+				if(queryResults.size() >= maxResults) break;
+				queryResults.add(new QueryResult(personResult, ResultType.PERSON));
+			}
+		}
+		
+		if(includeCompetitions && queryResults.size() < maxResults) {
+			List<String> competitionResults = wordStorageCompetitions.query(query, maxResults - queryResults.size());
+			for(String competitionResult : competitionResults) {
+				if(queryResults.size() >= maxResults) break;
+				queryResults.add(new QueryResult(competitionResult, ResultType.COMPETITION));
+			}
+		}
+		
+		return queryResults;
+	}
+	
+	public static enum ResultType {
+		EVENT,
+		COMPETITION,
+		PERSON;
+		
+		private String jsonName;
+		
+		private ResultType() {
+			jsonName = this.toString().toLowerCase();
+		}
+		
+		public String jsonName() {
+			return jsonName;
 		}
 	}
 	
-	private enum ResultType {
-		EVENT,
-		COMPETITION,
-		PERSON,
-	}
-	
-	private static record QueryResult(String result, ResultType type) {}
+	public static record QueryResult(String result, ResultType type) {}
 	
 	public static void main(String[] args) {
 		CubeSearch cs;
 		try {
-			Connection conn = DatabaseConnector.getConnection("cubestats", "cubing", "jdbc:mariadb://localhost:3306/staging");
+			Connection conn = DatabaseConnector.getConnection("cubestats", "cubing", "jdbc:mariadb://localhost:3306/live");
 			cs = new CubeSearch(conn);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		
-		//System.out.println(WordStorage.getWordInt("chapman"));
-		
-		//cs.query("Chapman", 10).forEach(r -> System.out.println(r.type + ": " + r.result));
-		
 		
 		List<QueryResult> result;
 		

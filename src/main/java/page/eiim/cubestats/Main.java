@@ -6,11 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import page.eiim.cubestats.tasks.TaskGetDumpFiles;
+import page.eiim.cubestats.tasks.TaskMigrateDatabase;
 import page.eiim.cubestats.web.MainServer;
 
 public class Main {
@@ -39,7 +42,7 @@ public class Main {
 		}
 		
 		System.out.println("Loading configuration from " + configPath);
-		Settings settings = new Settings();
+		Settings.Builder sb = new Settings.Builder();
 		JsonObject root;
 		JsonObject networking = null;
 		try (BufferedReader reader = new BufferedReader(new FileReader(configPath))) {
@@ -59,33 +62,32 @@ public class Main {
 				
 				switch(key) {
 					case "networking" -> networking = value.getAsJsonObject();
-					case "export_metadata_url" -> settings.exportMetadataUrl = value.getAsString();
-					case "database_dump_url" -> settings.databaseDumpUrl = value.getAsString();
-					case "user_agent" -> settings.userAgent = value.getAsString();
-					case "data_directory" -> settings.dataDirectory = new File(value.getAsString());
-					case "last_dump_metadata_file" -> settings.lastDumpMetadataFile = new File(value.getAsString());
+					case "export_metadata_url" -> sb.exportMetadataUrl = value.getAsString();
+					case "database_dump_url" -> sb.databaseDumpUrl = value.getAsString();
+					case "user_agent" -> sb.userAgent = value.getAsString();
+					case "data_directory" -> sb.dataDirectory = new File(value.getAsString());
+					case "last_dump_metadata_file" -> sb.lastDumpMetadataFile = new File(value.getAsString());
 					
-					case "my_sql_exe" -> settings.mySQLExe = value.getAsString();
-					case "db_user_name" -> settings.dbUserName = value.getAsString();
-					case "db_password" -> settings.dbPassword = value.getAsString();
-					case "db_host" -> settings.dbHost = value.getAsString();
-					case "db_port" -> settings.dbPort = value.getAsInt();
-					case "db_schema_staging" -> settings.dbSchemaStaging = value.getAsString();
-					case "db_schema_live" -> settings.dbSchemaLive = value.getAsString();
-					case "db_url_staging" -> settings.dbUrlSatging = value.getAsString();
-					case "db_url_live" -> settings.dbUrlLive = value.getAsString();
-					case "db_schema_owner" -> settings.dbSchemaOwner = value.getAsString();
+					case "my_sql_exe" -> sb.mySQLExe = value.getAsString();
+					case "db_user_name" -> sb.dbUserName = value.getAsString();
+					case "db_password" -> sb.dbPassword = value.getAsString();
+					case "db_host" -> sb.dbHost = value.getAsString();
+					case "db_port" -> sb.dbPort = value.getAsInt();
+					case "db_schema_staging" -> sb.dbSchemaStaging = value.getAsString();
+					case "db_schema_live" -> sb.dbSchemaLive = value.getAsString();
+					case "db_url_staging" -> sb.dbUrlStaging = value.getAsString();
+					case "db_url_live" -> sb.dbUrlLive = value.getAsString();
 					
-					case "import_charset" -> settings.importCharset = Charset.forName(value.getAsString());
+					case "import_charset" -> sb.importCharset = Charset.forName(value.getAsString());
 					
-					case "min_thread_pool_size" -> settings.minThreadPoolSize = value.getAsInt();
-					case "max_thread_pool_size" -> settings.maxThreadPoolSize = value.getAsInt();
-					case "resources_root" -> settings.resourcesRoot = new File(value.getAsString());
-					case "hostname" -> settings.hostname = value.getAsString();
-					case "enable_request_logging" -> settings.enableRequestLogging = value.getAsBoolean();
+					case "min_thread_pool_size" -> sb.minThreadPoolSize = value.getAsInt();
+					case "max_thread_pool_size" -> sb.maxThreadPoolSize = value.getAsInt();
+					case "resources_root" -> sb.resourcesRoot = new File(value.getAsString());
+					case "hostname" -> sb.hostname = value.getAsString();
+					case "enable_request_logging" -> sb.enableRequestLogging = value.getAsBoolean();
 					
-					case "no_import" -> settings.noImport = value.getAsBoolean();
-					case "no_webserver" -> settings.noWebserver = value.getAsBoolean();
+					case "no_import" -> sb.noImport = value.getAsBoolean();
+					case "no_webserver" -> sb.noWebserver = value.getAsBoolean();
 					
 				}
 			}
@@ -93,17 +95,75 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
+		Settings settings = sb.build();
+		AtomicReference<SystemStatus> status = new AtomicReference<>(SystemStatus.NORMAL);
 		
-		if(!settings.noImport) {
-			DAGScheduler scheduler = new DAGScheduler(settings);
-			scheduler.runAllTasks();
-		}
 		if(!settings.noWebserver) {
 			if(networking == null) {
 				System.err.println("No networking configuration found, can't run web server");
 			} else {
-				MainServer.run(settings, networking);
+				MainServer server = new MainServer(settings, networking);
+				server.start();
+				while(true) {
+					try {
+						switch(status.get()) {
+							case DATA_READY -> {
+								System.out.println("Shutting down web server for data transition.");
+								if(server.shutdown()) {
+									status.set(SystemStatus.SERVER_OFFLINE);
+								} else {
+									System.err.println("Failed to shut down web server, attempting to die");
+									System.exit(1);
+								}
+							}
+							case DATA_FINISHED -> {
+								System.out.println("Data import finished, restarting web server.");
+								server = new MainServer(settings, networking);
+								server.start();
+								status.set(SystemStatus.NORMAL);
+							}
+							default -> {
+								// Do nothing
+							}
+						}
+						Thread.sleep(60 * 1000); // Check for update every minute
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
+		}
+
+		if(!settings.noImport) {
+			Thread thread = new Thread(() -> {
+				// Check for updates hourly
+				while(true) {
+					try {
+						if(status.get() == SystemStatus.NORMAL && TaskGetDumpFiles.checkForUpdate(settings)) {
+							status.set(SystemStatus.IMPORT_STARTED);
+							System.out.println("New WCA database dump available, starting import.");
+							DAGScheduler scheduler = new DAGScheduler(settings);
+							scheduler.runAllTasks();
+							System.out.println("WCA database dump import finished, waiting for web server to go offline.");
+							status.set(SystemStatus.DATA_READY);
+							// Wait until the server is down
+							while(status.get() != SystemStatus.SERVER_OFFLINE) {
+								Thread.sleep(1 * 1000); // Check every second
+							}
+							System.out.println("Web server is offline, migrating data.");
+							TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
+							migrateTask.run();
+							status.set(SystemStatus.DATA_FINISHED);
+						} else {
+						}
+						// Sleep for 1 hour
+						Thread.sleep(3600 * 1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			thread.start();
 		}
 	}
 	
@@ -124,7 +184,6 @@ public class Main {
 		System.out.println("--db_port\t\t\tDatabase port");
 		System.out.println("--db_schema_staging\t\tDatabase schema for staging data");
 		System.out.println("--db_schema_live\t\tDatabase schema for live data");
-		System.out.println("--db_schema_owner\t\tDatabase schema owner (for granting permissions)");
 		
 		System.out.println();
 		System.out.println("Web server options:");

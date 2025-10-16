@@ -26,7 +26,6 @@ public class TaskGetDumpFiles extends Task {
 	private String databaseDumpUrl;
 	private final String userAgent;
 	private final File dataDirectory;
-	private final File lastDumpMetadataFile;
 	
 	public TaskGetDumpFiles(Settings settings) {
 		synchronized (settings) {
@@ -34,7 +33,6 @@ public class TaskGetDumpFiles extends Task {
 			databaseDumpUrl = settings.databaseDumpUrl;
 			userAgent = settings.userAgent;
 			dataDirectory = settings.dataDirectory;
-			lastDumpMetadataFile = settings.lastDumpMetadataFile;
 		}
 	}
 
@@ -60,43 +58,8 @@ public class TaskGetDumpFiles extends Task {
 			isDone = true;
 			return;
 		}
-		System.out.println("Downloading database dump from " + databaseDumpUrl);
-		// Check if already up-to-date
-		try {
-			// HTTP HEAD request to get last modified date
-			HttpURLConnection dumpConnection = (HttpURLConnection) new URI(databaseDumpUrl).toURL().openConnection();
-			dumpConnection.setRequestProperty("User-Agent", userAgent);
-			dumpConnection.setRequestMethod("HEAD");
-			Map<String, List<String>> fields = dumpConnection.getHeaderFields();
-			String lastModified = fields.get("Last-Modified").get(0);
-			Instant lastModifiedInstant = Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModified));
-			// Check last modified date against last download date
-			if(lastDumpMetadataFile.exists()) {
-				String[] lastDumpMetadata = new String(Files.readAllBytes(lastDumpMetadataFile.toPath()), Charset.forName("UTF-8")).split("\n");
-				try {
-					Instant lastDumpDate = Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastDumpMetadata[0]));
-					if(!lastModifiedInstant.isAfter(lastDumpDate)) {
-						result = new TaskResult(true, "Database dump is already up to date.");
-						isDone = true;
-						return;
-					}
-				} catch(DateTimeParseException e) {
-					// Malfrormed date, redownload and overwrite file
-					System.out.println("Last dump metadata file is malformed, redownloading database dump.");
-				}
-				lastDumpMetadata[0] = lastModified;
-				Files.write(lastDumpMetadataFile.toPath(), String.join("\n", lastDumpMetadata).getBytes(Charset.forName("UTF-8")));
-			} else {
-				Files.write(lastDumpMetadataFile.toPath(), lastModified.getBytes(Charset.forName("UTF-8")));
-			}
-			
-		} catch (IOException | URISyntaxException e1) {
-			e1.printStackTrace();
-			result = new TaskResult(false, e1.getMessage());
-			isDone = true;
-			return;
-		}
 		
+		System.out.println("Downloading database dump from " + databaseDumpUrl);
 		try {
 			HttpURLConnection dumpConnection = (HttpURLConnection) new URI(databaseDumpUrl).toURL().openConnection();
 			dumpConnection.setRequestProperty("User-Agent", userAgent);
@@ -122,5 +85,41 @@ public class TaskGetDumpFiles extends Task {
 		
 		result = new TaskResult(true, "Database dump successfully downloaded.");
 		isDone = true;
+	}
+	
+	public static boolean checkForUpdate(Settings settings) {
+		// Check if already up-to-date
+		try {
+			// HTTP HEAD request to get last modified date
+			HttpURLConnection dumpConnection = (HttpURLConnection) new URI(settings.databaseDumpUrl).toURL().openConnection();
+			dumpConnection.setRequestProperty("User-Agent", settings.userAgent);
+			dumpConnection.setRequestMethod("HEAD");
+			Map<String, List<String>> fields = dumpConnection.getHeaderFields();
+			String lastModified = fields.get("Last-Modified").get(0);
+			Instant lastModifiedInstant = Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModified));
+			// Check last modified date against last download date
+			if(settings.lastDumpMetadataFile.exists()) {
+				String[] lastDumpMetadata = new String(Files.readAllBytes(settings.lastDumpMetadataFile.toPath()), Charset.forName("UTF-8")).split("\n");
+				try {
+					Instant lastDumpDate = Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastDumpMetadata[0]));
+					if(!lastModifiedInstant.isAfter(lastDumpDate)) {
+						return false; // No update needed
+					}
+				} catch(DateTimeParseException e) {
+					// Malfrormed date, redownload and overwrite file
+					System.out.println("Last dump metadata file is malformed, redownloading database dump.");
+				}
+				lastDumpMetadata[0] = lastModified;
+				Files.write(settings.lastDumpMetadataFile.toPath(), String.join("\n", lastDumpMetadata).getBytes(Charset.forName("UTF-8")));
+			} else {
+				Files.write(settings.lastDumpMetadataFile.toPath(), lastModified.getBytes(Charset.forName("UTF-8")));
+			}
+			
+		} catch (IOException | URISyntaxException e1) {
+			e1.printStackTrace();
+			return false; // Unknown error, assume no update
+		}
+		
+		return true; // Update needed
 	}
 }

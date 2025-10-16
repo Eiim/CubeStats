@@ -15,7 +15,6 @@ import page.eiim.cubestats.tasks.TaskCSEvents;
 import page.eiim.cubestats.tasks.TaskCleanupDatabase;
 import page.eiim.cubestats.tasks.TaskGetDumpFiles;
 import page.eiim.cubestats.tasks.TaskImportWCADatabase;
-import page.eiim.cubestats.tasks.TaskNemesize;
 import page.eiim.cubestats.tasks.TaskPercentiles;
 
 public class TaskDAG {
@@ -35,14 +34,14 @@ public class TaskDAG {
 		Node importDatabase = new Node(new TaskImportWCADatabase(settings));
 		Node calcPercentiles = new Node(new TaskPercentiles(settings));
 		Node csEvents = new Node(new TaskCSEvents(settings));
-		Node calcNemeses = new Node(new TaskNemesize(settings));
+		//Node calcNemeses = new Node(new TaskNemesize(settings));
 		
 		getFiles.dependents.add(importDatabase);
 		cleanupDatabase.dependents.add(importDatabase);
 		importDatabase.dependents.add(calcPercentiles);
 		importDatabase.dependents.add(csEvents);
-		calcPercentiles.dependents.add(calcNemeses);
-		csEvents.dependents.add(calcNemeses);
+		//calcPercentiles.dependents.add(calcNemeses);
+		//csEvents.dependents.add(calcNemeses);
 		
 		roots.add(getFiles);
 		roots.add(cleanupDatabase);

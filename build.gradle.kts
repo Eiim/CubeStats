@@ -2,14 +2,12 @@ group = "page.eiim.cubestats"
 version = "v0"
 
 plugins {
-	// Apply the application plugin to add support for building a CLI application in Java.
 	application
 	java
 	eclipse
 }
 
 repositories {
-	// Use Maven Central for resolving dependencies.
 	mavenCentral()
 }
 
@@ -28,7 +26,6 @@ dependencies {
 	implementation("org.apache.logging.log4j:log4j-api:2.25.1")
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(25)
@@ -48,8 +45,7 @@ tasks.jar {
         )
     }
 
-    // Optionally include dependencies in the JAR (fat jar)
-    // if you don't use a plugin like Shadow
+    // Include dependencies in the JAR (fat jar)
     from({
         configurations.runtimeClasspath.get()
             .filter { it.name.endsWith("jar") }

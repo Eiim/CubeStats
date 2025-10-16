@@ -3,6 +3,7 @@ package page.eiim.cubestats.web;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.eclipse.jetty.compression.server.CompressionConfig;
@@ -10,9 +11,12 @@ import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.http.CompressedContentFormat;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.CustomRequestLog;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Slf4jRequestLogWriter;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.ResourceFactory;
@@ -23,7 +27,10 @@ import com.google.gson.JsonObject;
 import page.eiim.cubestats.Settings;
 
 public class MainServer {
-	public static void run(Settings settings, JsonObject networking) {
+	
+	private Server server;
+	
+	public MainServer(Settings settings, JsonObject networking) {
 		QueuedThreadPool threadPool = new QueuedThreadPool(settings.maxThreadPoolSize, settings.minThreadPoolSize);
 		threadPool.setName("serversPool");
 		
@@ -33,7 +40,7 @@ public class MainServer {
 		WebServerBuilder serverBuilder = new WebServerBuilder(threadPool, hostname);
 		
 		// Set up HTTP/HTTPS/QUIC
-		Server server = handleNetworking(networking, serverBuilder);
+		server = handleNetworking(networking, serverBuilder);
 		
 		// Enable request logging
 		// TODO: allow customization of logging location
@@ -48,15 +55,30 @@ public class MainServer {
 		server.setHandler(compressionHandler);
 		
 		// Handle static resources
-		ResourceHandler handler = new ResourceHandler();
-		handler.setBaseResource(ResourceFactory.of(handler).asResource(settings.resourcesRoot));
-		handler.setDirAllowed(false);
-		handler.setWelcomeFiles(List.of("index.html"));
-		handler.setAcceptRanges(true);
-		handler.setCacheControl("max-age=86400");
-		handler.setPrecompressedFormats(CompressedContentFormat.GZIP);
+		ResourceHandler staticHandler = new ResourceHandler();
+		staticHandler.setBaseResource(ResourceFactory.of(staticHandler).newResource(settings.resourcesRoot.getPath()));
+		staticHandler.setDirAllowed(false);
+		staticHandler.setWelcomeFiles(List.of("index.html"));
+		staticHandler.setAcceptRanges(true);
+		staticHandler.setCacheControl("max-age=86400");
+		staticHandler.setPrecompressedFormats(CompressedContentFormat.GZIP);
 		
-		compressionHandler.setHandler(handler);
+		Handler.Sequence pageHandlers = new Handler.Sequence();
+		ContextHandlerCollection contextHandlers = new ContextHandlerCollection();
+		
+		try {
+			CubeSearch cubeSearch = new CubeSearch(DatabaseConnector.getConnection(settings.dbUserName, settings.dbPassword, settings.dbUrlLive));
+			ContextHandler searchHandler = new ContextHandler(new SearchHandler(cubeSearch), "/searchapi");
+			searchHandler.setAllowNullPathInContext(true);
+			contextHandlers.addHandler(searchHandler);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		pageHandlers.addHandler(contextHandlers);
+		pageHandlers.addHandler(staticHandler); // Default to static handler if nothing else matches
+		compressionHandler.setHandler(pageHandlers);
 		
 		ErrorHandler errorHandler = new ErrorHandler() {
 			@Override
@@ -74,13 +96,27 @@ public class MainServer {
 			}
 		};
 		server.setErrorHandler(errorHandler);
-
-		// Start the Server to start accepting connections from clients.
+	}
+	
+	public void start() {
+		System.out.println("Starting web server");
 		try {
 			server.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public boolean shutdown() {
+		System.out.println("Shutting down web server");
+		try {
+			server.stop();
+			return true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
 		}
 	}
 	
