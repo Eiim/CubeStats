@@ -217,7 +217,6 @@ public class CubeSearch {
 		end = System.nanoTime();
 		System.out.println("Query 'Dani' took " + (end - start) / 1_000_000.0 + " ms");
 		result.forEach(r -> System.out.println(r.type + ": " + r.result));
-		
 	}
 
 }

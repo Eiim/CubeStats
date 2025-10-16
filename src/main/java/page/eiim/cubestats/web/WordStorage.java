@@ -88,15 +88,15 @@ public class WordStorage {
 	
 	private void getEntriesWithMatchingWords(String query, List<Entry> results) {
 		String[] queryWords = query.split(" ");
-		int[] invQueryWordShorts = new int[queryWords.length];
+		int[] invQueryWordInts = new int[queryWords.length];
 		for(int i = 0; i < queryWords.length; i++) {
-			invQueryWordShorts[i] = ~getWordInt(queryWords[i]);
+			invQueryWordInts[i] = ~getWordInt(queryWords[i]);
 		}
 		
 		Set<Entry> candidates = new HashSet<>();
 		
 		for(int entryShort : wordStorage.keySet()) {
-			for(int queryShort : invQueryWordShorts) {
+			for(int queryShort : invQueryWordInts) {
 				if((entryShort | queryShort) == 0xFFFFFFFF) {
 					candidates.addAll(wordStorage.get(entryShort));
 					break;
@@ -113,7 +113,7 @@ public class WordStorage {
 				}
 			}
 			if(allMatch) {
-				if(!results.contains(entry.fullText)) results.add(entry);
+				if(!results.contains(entry)) results.add(entry);
 			}
 		}
 	}
@@ -182,5 +182,30 @@ public class WordStorage {
 			}
 		}
 	}
+	
+	// Alternate implementation, appears to be slower in limited testing - consider more robust benchmarking
+	/*
+	private class StringTree2 {
+		private TreeMap<String, List<Entry>> tree;
+		
+		public StringTree2() {
+			tree = new TreeMap<>();
+		}
+		
+		public void add(Entry entry) {
+			String base = entry.fullText;
+			tree.putIfAbsent(base, new ArrayList<>());
+			tree.get(base).add(entry);
+		}
+		
+		public void get(String query, List<Entry> results) {
+			String higherKey = tree.ceilingKey(query);
+			while(higherKey != null && higherKey.startsWith(query)) {
+				results.addAll(tree.get(higherKey));
+				higherKey = tree.higherKey(higherKey);
+			}
+		}
+	}
+	*/
 
 }
