@@ -88,7 +88,7 @@ public class Main {
 					
 					case "no_import" -> sb.noImport = value.getAsBoolean();
 					case "no_webserver" -> sb.noWebserver = value.getAsBoolean();
-					
+					case "migrate_only" -> sb.migrateOnly = value.getAsBoolean();
 				}
 			}
 		} catch (IOException e) {
@@ -97,6 +97,14 @@ public class Main {
 		}
 		Settings settings = sb.build();
 		AtomicReference<SystemStatus> status = new AtomicReference<>(SystemStatus.NORMAL);
+		
+		if(settings.migrateOnly) {
+			System.out.println("Migrate-only flag set, migrating database and exiting.");
+			TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
+			migrateTask.run();
+			System.out.println("Database migration finished, exiting.");
+			return;
+		}
 		
 		boolean startedWebserver = false;
 		MainServer server = null;
