@@ -25,7 +25,7 @@ public class CubeSearch {
 		List<String> competitionIdsList = new ArrayList<>();
 		
 		var stmt = conn.createStatement();
-		var rs = stmt.executeQuery("SELECT id FROM Events");
+		var rs = stmt.executeQuery("SELECT id FROM events");
 		while(rs.next()) {
 			eventIds.add(rs.getString(1).toLowerCase(Locale.ROOT));
 		}
@@ -33,7 +33,7 @@ public class CubeSearch {
 		stmt.close();
 		
 		stmt = conn.createStatement();
-		rs = stmt.executeQuery("SELECT id, name FROM Competitions");
+		rs = stmt.executeQuery("SELECT id, name FROM competitions");
 		while(rs.next()) {
 			competitionIds.add(rs.getString(1).toLowerCase(Locale.ROOT));
 			competitionIdsList.add(rs.getString(1).toLowerCase(Locale.ROOT));
@@ -43,7 +43,7 @@ public class CubeSearch {
 		stmt.close();
 		
 		stmt = conn.createStatement();
-		rs = stmt.executeQuery("SELECT wca_id, name FROM Persons");
+		rs = stmt.executeQuery("SELECT wca_id, name FROM persons");
 		while(rs.next()) {
 			personIds.add(new WCAId(rs.getString(1)));
 			personIdsList.add(rs.getString(1).toLowerCase(Locale.ROOT));
