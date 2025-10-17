@@ -1,0 +1,41 @@
+Introducing CubeSearch v1!
+2025-10-17
+
+cubesearch-v1
+Today, I'm publicly releasing CubeSearch, a simple search API for WCA entries that can be used in the browser or programmatically.
+The WCA has a search function on the website. In some ways, it's very good. It searches events and people as well as blog posts, regulations, and incidents. It's also a bit slow.
+![The WCA search API often spends over a second or longer to process a query. In this case, it ran for 1.69 seconds.](cubesearch-v1-im1.png)
+There appears to be some caching behind the scenes to help, but it's rare to see a request process for less than a few hundred milliseconds, which keeps it from really feeling responsive. I suspect that's also why it's disallowed from robots.txt, meaning (well-behaved) programmatic users can't use it to build applications. It also often doesn't return the result you'd expect: why should [Adam Luke](https://www.worldcubeassociation.org/persons/2022LUKE03) be the first search result for "Luke", while anyone with the first name "Luke" doesn't even make the search results? I wanted a search feature for an upcoming part of this site anyways, so I made my own, which I call CubeSearch!
+Here's the short version: CubeSearch searches WCA events, competitions, and people. It looks for exact ID matches, then names or IDs that start with the query, then a more loose substring match. You can filter to only events/competitions/people. When using as a browser search engine, you can use it to quickly jump to records, single rankings, or average rankings for an event. On average, I find the results to be better than the WCA's search, and it's much faster to boot.
+## Adding it to your browser
+Let me know if these get out of date over time!
+### Firefox (desktop)
+Go to Settings, then select Search on the left. Scroll down to Search Shortcuts. Click Add. In the popup, set the search engine name to CubeSearch and the URL to `https://cube-stats.com/serachapi?f=wca&q=%s`. Set the keyword to `cs`, or `wca`, or whatever else you like. Then click Add Engine. You should now be able to select CubeSearch as a search option in the dropdown in the address bar, or type something like `cs yiheng wang` (depending on your keyword) to quickly use the search.
+### Chrome (desktop)
+Go to Settings, then select "Search engine" on the left. Under "Site search", click Add. In the popup, set the name to CubeSearch and the URL to `https://cube-stats.com/serachapi?f=wca&q=%s`. Set the shortcut to `cs`, or `wca`, or whatever else you like. You should now be able to type something like `cs yiheng wang` (depending on your keyword) to quickly use the search.
+### Edge (desktop)
+Go to settings, then click "Privacy, serach, and services" on the left, then "Search and connected experiences", then "Address bar and search", then "Search engines". Now click "Add search engine". You should now be able to type something like `cs yiheng wang` (depending on your keyword) to quickly use the search.
+### Firefox (mobile)
+Go to Settings, then Search, then "Manage alternative search engines". Click "Add search engine". Set the name to CubeSearch and the URL to `https://cube-stats.com/serachapi?f=wca&q=%s`. Note that there is no suggestions URL for CubeSearch at this time. You should now be able to select it from the dropdown to the left of the address bar.
+### Safari (desktop/mobile)
+Apple doesn't let users add their own search engines, so I'd have to do a bunch more stuff (I think make an extension for desktop and an app for mobile) to make it work. Given that I don't own any Apple products, that's not happening any time soon. If someone else wants to, be my guest! There might also be some third-party extensions that add this functionality, but I'm not sure if any are updated or still on the store.
+### Chrome (mobile)
+As far as I can tell, Chrome doesn't let you add search engines on mobile.
+### Others
+If you're using another browser, it's probably either a Chrome reskin (like Opera and Edge) and so it will probably have something similar to Chrome on desktop and nothing on mobile, or you're a browser fanatic using an experimental build of Servo or whatever and you should know how to find the appropriate setting, if it exists. Regardless, if you find something that works, feel free to let me know and I might add it here.
+## Search tips
+Here's a few special features you can use with CubeSearch once you've added it to the browser!
+* Start your query with `e!`, `c!`, or `p!` to search only events, competitions, or people. For example, searching `john` currently pulls up [Johns Hopkins Winter 2015](https://www.worldcubeassociation.org/competitions/johnshopkinswinter2015), but `p!john` finds [John Randall](https://www.worldcubeassociation.org/persons/2004rand01). In most cases you probably won't need it, but it might help to avoid ambiguity.
+* When searching for events, you're normally taken to the single rankings. Start the search with `a!` to be taken to the average rankings, or `r!` for the records page.
+* Since events have top priority, you can often use a shortened version of them. For NxN events, just using the digit once is enough. For example, `7` takes you to the 7x7 single rankings, or you can use `a!3` for the 3x3 average rankings. You can also use `p` for Pyraminx, `c` for Clock, or `s` for Skewb. At the moment `m` takes you to Magic instead of Megaminx, which I intend to change at some point. Two-letter abbreviations also work: `sq` for Square-1 (although it's not much better than the full ID of `sq1`), `mi` for Megaminx, and `mm` for Master Magic. 3x3 derivatives don't have nice shorthands at the moment: you'll need to search at least `333b` to pull up 3-blind, for example. There might be some more shorthands enabled here in the future.
+* If your search doesn't return any results, you'll be taken to the WCA homepage.
+## Using it as an API
+CubeSearch is also intended for use as an API! I don't have any robots.txt restrictions or authentication requirements on it at the moment (although I may change that in the future), all I ask at the moment is that you wait until you've received your request before sending another (that is, send requests synchronously). Here's what you need to know if you're going that route:
+* The base URL for the API is `https://cube-stats.com/searchapi`.
+* The search query is added as the URL parameter `q`: `https://cube-stats.com/searchapi?q=some%20search%20here`.
+* You can specify whether you want to search events, competitions, or people with the URL parameter `t`, which you can set to `event`, `competition`, or `person`. Example: `https://cube-stats.com/searchapi?q=john&t=person`
+* You can specify what format you want the results to be in with the URL parameter `f`. The default is a JSON-encoded array of objects. Each object in the JSON array has at least these two values: `result` (containing the WCA ID as a string) and `type` (containing "event", "competition", or "person"). In the future, expect more values to be added.  You can also specify a format of `wca` to get a HTTP 303 redirect to the WCA page for the top result (used for browsers), or `wca_url` to get the same URL in a HTTP 200 response. In case the default behavior changes in the future, you might want to explicitly specify a format of `json`, which will always return the JSON array.
+* You can specify how many results you want to return with the URL parameter `n` (capped at 100). If you set the format `wca`, you'll only ever get one. If you set the format `wca_url`, the URLs will be newline-separated. The default is 10.
+* I always encode in UTF-8.
+## More to come
+This represents an important step forward in the backend of CubeStats, and I had to learn a lot to get this working. The code will be open-sourced soon™ along with the first release of the CubeStats model. I expect to make improvements to the API, especially the JSON return values, in the near future, to support a visual search bar on the website. Any significant updates will be reflected here.
