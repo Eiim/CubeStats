@@ -89,7 +89,6 @@ public class Main {
 					
 					case "no_import" -> sb.noImport = value.getAsBoolean();
 					case "no_webserver" -> sb.noWebserver = value.getAsBoolean();
-					case "migrate_only" -> sb.migrateOnly = value.getAsBoolean();
 				}
 			}
 		} catch (IOException e) {
@@ -97,14 +96,6 @@ public class Main {
 			return;
 		}
 		Settings settings = sb.build();
-		
-		if(settings.migrateOnly) {
-			System.out.println("Migrate-only flag set, migrating database and exiting.");
-			TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
-			migrateTask.run();
-			System.out.println("Database migration finished, exiting.");
-			return;
-		}
 		
 		boolean startedWebserver = false;
 		MainServer server = null;
@@ -148,6 +139,8 @@ public class Main {
 					System.out.println("Shutting down web server for data transition.");
 					if(server.shutdown()) {
 						settings.swapDatabases();
+						TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
+						migrateTask.run();
 						server = new MainServer(settings, networking);
 						server.start();
 						status.set(SystemStatus.NORMAL);

@@ -10,7 +10,6 @@ public final class Settings {
 
 	public final boolean noImport;
 	public final boolean noWebserver;
-	public final boolean migrateOnly;
 	
 	public final String exportMetadataUrl;
 	public final String databaseDumpUrl;
@@ -43,7 +42,6 @@ public final class Settings {
 	private Settings(Builder b) {
 		noImport = b.noImport;
 		noWebserver = b.noWebserver;
-		migrateOnly = b.migrateOnly;
 		exportMetadataUrl = b.exportMetadataUrl;
 		databaseDumpUrl = b.databaseDumpUrl;
 		userAgent = b.userAgent;
@@ -90,7 +88,6 @@ public final class Settings {
 	public static class Builder {
 		public boolean noImport = false;
 		public boolean noWebserver = false;
-		public boolean migrateOnly = false;
 		
 		public String exportMetadataUrl = "https://www.worldcubeassociation.org/api/v0/export/public";
 		public String databaseDumpUrl = "https://assets.worldcubeassociation.org/export/developer/wca-developer-database-dump.zip";
