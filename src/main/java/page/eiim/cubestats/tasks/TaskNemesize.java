@@ -24,7 +24,7 @@ public class TaskNemesize extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, DatabaseCSN.DefaultSchema.STAGING);
+			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_nemeses").executeUpdate();
 			conn.prepareStatement("CREATE TABLE cs_nemeses (nemesizer INT NOT NULL, nemesizee INT NOT NULL)").executeUpdate();

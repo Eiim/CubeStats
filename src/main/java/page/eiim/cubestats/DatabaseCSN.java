@@ -12,22 +12,16 @@ import java.util.Properties;
 
 public class DatabaseCSN {
 	
-	public static Connection getConnection(Settings settings, DefaultSchema schema) throws SQLException {
+	public static Connection getConnection(Settings settings, DatabaseSchema schema) throws SQLException {
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", settings.dbUserName);
 		connectionProps.put("password", settings.dbPassword);
 		//connectionProps.put("connectionCollation", "utf8mb4_unicode_ci");
-		String dbUrl = switch(schema) {
-			case STAGING -> settings.dbUrlStaging;
-			case LIVE -> settings.dbUrlLive;
-		};
 
-		conn = DriverManager.getConnection(dbUrl, connectionProps);
+		conn = DriverManager.getConnection(schema.url(), connectionProps);
 
 		//System.out.println("Connected to database");
 		return conn;
 	}
-	
-	public static enum DefaultSchema { STAGING, LIVE };
 }

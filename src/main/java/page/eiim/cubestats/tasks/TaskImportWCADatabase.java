@@ -5,25 +5,9 @@ import java.io.File;
 import page.eiim.cubestats.Settings;
 
 public class TaskImportWCADatabase extends Task {
-
-	private final File dataDirectory;
-	private final String mysqlExe;
-	private final String dbHost;
-	private final int dbPort;
-	private final String dbUserName;
-	private final String dbPassword;
-	private final String dbSchemaStaging;
 	
 	public TaskImportWCADatabase(Settings settings) {
-		synchronized (settings) {
-			dataDirectory = settings.dataDirectory;
-			mysqlExe = settings.mySQLExe;
-			dbHost = settings.dbHost;
-			dbPort = settings.dbPort;
-			dbUserName = settings.dbUserName;
-			dbPassword = settings.dbPassword;
-			dbSchemaStaging = settings.dbSchemaStaging;
-		}
+		super(settings);
 	}
 
 	@Override
@@ -36,15 +20,15 @@ public class TaskImportWCADatabase extends Task {
 		
 		// Execute mysql command line tool to import the database dump
 		ProcessBuilder pb = new ProcessBuilder(
-				mysqlExe,
-				"-h", dbHost,
-				"-P", Integer.toString(dbPort),
-				"-u", dbUserName,
-				"-p" + dbPassword,
-				dbSchemaStaging
+				settings.mySQLExe,
+				"-h", settings.dbHost,
+				"-P", Integer.toString(settings.dbPort),
+				"-u", settings.dbUserName,
+				"-p" + settings.dbPassword,
+				stagingSchema.name()
 		);
-		pb.directory(dataDirectory);
-		pb.redirectInput(new File(dataDirectory, "wca-developer-database-dump.sql"));
+		pb.directory(settings.dataDirectory);
+		pb.redirectInput(new File(settings.dataDirectory, "wca-developer-database-dump.sql"));
 		try {
 			Process process = pb.start();
 			int exitCode = process.waitFor();

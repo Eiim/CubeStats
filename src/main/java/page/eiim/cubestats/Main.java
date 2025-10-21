@@ -36,6 +36,7 @@ public class Main {
 			String arg = args[i];
 			if(arg.startsWith("--")) {
 				configArgs.put(arg.substring(2), args[i+1]);
+				System.out.println("Overriding config option " + arg.substring(2) + " with command line argument.");
 			} else {
 				throw new IllegalArgumentException("Expected argument starting with --, got: " + arg);
 			}
@@ -73,10 +74,10 @@ public class Main {
 					case "db_password" -> sb.dbPassword = value.getAsString();
 					case "db_host" -> sb.dbHost = value.getAsString();
 					case "db_port" -> sb.dbPort = value.getAsInt();
-					case "db_schema_staging" -> sb.dbSchemaStaging = value.getAsString();
-					case "db_schema_live" -> sb.dbSchemaLive = value.getAsString();
-					case "db_url_staging" -> sb.dbUrlStaging = value.getAsString();
-					case "db_url_live" -> sb.dbUrlLive = value.getAsString();
+					case "db_schema_a" -> sb.dbSchemaA = value.getAsString();
+					case "db_schema_b" -> sb.dbSchemaB = value.getAsString();
+					case "db_url_a" -> sb.dbUrlA = value.getAsString();
+					case "db_url_b" -> sb.dbUrlB = value.getAsString();
 					
 					case "import_charset" -> sb.importCharset = Charset.forName(value.getAsString());
 					
@@ -96,7 +97,6 @@ public class Main {
 			return;
 		}
 		Settings settings = sb.build();
-		AtomicReference<SystemStatus> status = new AtomicReference<>(SystemStatus.NORMAL);
 		
 		if(settings.migrateOnly) {
 			System.out.println("Migrate-only flag set, migrating database and exiting.");
@@ -118,6 +118,7 @@ public class Main {
 			}
 		}
 		
+		AtomicReference<SystemStatus> status = new AtomicReference<>(SystemStatus.NORMAL);
 		if(!settings.noImport) {
 			Thread thread = new Thread(() -> {
 				// Check for updates hourly
@@ -128,17 +129,8 @@ public class Main {
 							System.out.println("New WCA database dump available, starting import.");
 							DAGScheduler scheduler = new DAGScheduler(settings);
 							scheduler.runAllTasks();
-							System.out.println("WCA database dump import finished, waiting for web server to go offline.");
+							System.out.println("WCA database dump import finished, prompting web server to go offline.");
 							status.set(SystemStatus.DATA_READY);
-							// Wait until the server is down
-							while(status.get() != SystemStatus.SERVER_OFFLINE) {
-								Thread.sleep(1 * 1000); // Check every second
-							}
-							System.out.println("Web server is offline, migrating data.");
-							TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
-							migrateTask.run();
-							status.set(SystemStatus.DATA_FINISHED);
-						} else {
 						}
 						// Sleep for 1 hour
 						Thread.sleep(3600 * 1000);
@@ -152,24 +144,16 @@ public class Main {
 		
 		while(startedWebserver) { // Effectively if(startedWebserver) while(true)
 			try {
-				switch(status.get()) {
-					case DATA_READY -> {
-						System.out.println("Shutting down web server for data transition.");
-						if(server.shutdown()) {
-							status.set(SystemStatus.SERVER_OFFLINE);
-						} else {
-							System.err.println("Failed to shut down web server, attempting to die");
-							System.exit(1);
-						}
-					}
-					case DATA_FINISHED -> {
-						System.out.println("Data import finished, restarting web server.");
+				if(status.get() == SystemStatus.DATA_READY) {
+					System.out.println("Shutting down web server for data transition.");
+					if(server.shutdown()) {
+						settings.swapDatabases();
 						server = new MainServer(settings, networking);
 						server.start();
 						status.set(SystemStatus.NORMAL);
-					}
-					default -> {
-						// Do nothing
+					} else {
+						System.err.println("Failed to shut down web server, attempting to die");
+						System.exit(1);
 					}
 				}
 				Thread.sleep(60 * 1000); // Check for update every minute
@@ -194,8 +178,8 @@ public class Main {
 		System.out.println("--db_password\t\t\tDatabase user password");
 		System.out.println("--db_host\t\t\tDatabase host");
 		System.out.println("--db_port\t\t\tDatabase port");
-		System.out.println("--db_schema_staging\t\tDatabase schema for staging data");
-		System.out.println("--db_schema_live\t\tDatabase schema for live data");
+		System.out.println("--db_schema_a\t\tFirst database schema");
+		System.out.println("--db_schema_b\t\tSecond database schema");
 		
 		System.out.println();
 		System.out.println("Web server options:");
@@ -215,9 +199,14 @@ public class Main {
 		System.out.println("--database_dump_url\t\tURL for the WCA database dump. If unset, found from the metadata file.");
 		System.out.println("--user_agent\t\t\tUser-Agent header to use for HTTP requests");
 		System.out.println("--last_dump_metadata_file\tMetadata file for the last downloaded database dump. Defaults to lastDumpMetadata.txt in the data directory");
-		System.out.println("--db_url_staging\t\tJDBC URL for the staging database");
-		System.out.println("--db_url_live\t\t\tJDBC URL for the live database");
+		System.out.println("--db_url_a\t\tJDBC URL for the first database");
+		System.out.println("--db_url_b\t\t\tJDBC URL for the second database");
 		System.out.println("--import_charset\t\tCharacter set of the WCA export files");
 	}
-
+	
+	private static enum SystemStatus {
+		NORMAL,
+		IMPORT_STARTED,
+		DATA_READY
+	}
 }

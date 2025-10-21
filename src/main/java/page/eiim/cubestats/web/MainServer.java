@@ -67,7 +67,7 @@ public class MainServer {
 		ContextHandlerCollection contextHandlers = new ContextHandlerCollection();
 		
 		try {
-			CubeSearch cubeSearch = new CubeSearch(DatabaseConnector.getConnection(settings.dbUserName, settings.dbPassword, settings.dbUrlLive));
+			CubeSearch cubeSearch = new CubeSearch(DatabaseConnector.getConnection(settings.dbUserName, settings.dbPassword, settings.liveSchema.url()));
 			ContextHandler searchHandler = new ContextHandler(new SearchHandler(cubeSearch), "/searchapi");
 			searchHandler.setAllowNullPathInContext(true);
 			contextHandlers.addHandler(searchHandler);

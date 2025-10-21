@@ -3,17 +3,22 @@ package page.eiim.cubestats.tasks;
 import java.time.Duration;
 import java.util.Date;
 
+import page.eiim.cubestats.DatabaseSchema;
 import page.eiim.cubestats.Settings;
 
 public abstract class Task implements Runnable {
 	protected boolean isDone = false;
 	protected TaskResult result = null;
 	protected Settings settings = null;
+	protected DatabaseSchema liveSchema = null;
+	protected DatabaseSchema stagingSchema = null;
 	
 	protected Task() {}
 	
 	public Task(Settings settings) {
 		this.settings = settings;
+		this.liveSchema = settings.liveSchema;
+		this.stagingSchema = settings.stagingSchema;
 	}
 	
 	public String name() { return null; }

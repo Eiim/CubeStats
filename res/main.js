@@ -18,6 +18,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
 	if(sidebarToggle != null) {sidebarToggle.addEventListener("click", openSidebar);}
 	
 	for(e of document.getElementsByClassName("date")) {
-		e.textContent = (new Date(e.textContent)).toLocaleDateString()
+		// Temporal has more consistent formatting, but is too new to be relied upon
+		if("Temporal" in window && "PlainDate" in Temporal) {
+			e.textContent = Temporal.PlainDate.from(e.textContent).toLocaleString()
+		} else {
+			[year, month, day] = e.textContent.split('-');
+			e.textContent = (new Date(+year, month-1, +day)).toLocaleDateString()
+		}
 	}
 });

@@ -20,7 +20,7 @@ public class TaskPercentiles extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, DatabaseCSN.DefaultSchema.STAGING);
+			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_pct_single").executeUpdate();
 			conn.prepareStatement("CREATE TABLE cs_pct_single AS (" + """

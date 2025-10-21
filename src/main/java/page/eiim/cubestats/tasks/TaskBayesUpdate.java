@@ -29,7 +29,7 @@ public class TaskBayesUpdate extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, DatabaseCSN.DefaultSchema.STAGING);
+			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
 			conn.setAutoCommit(false);
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_bayes_params").executeUpdate();

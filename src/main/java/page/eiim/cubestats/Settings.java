@@ -2,6 +2,9 @@ package page.eiim.cubestats;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public final class Settings {
 
@@ -21,10 +24,13 @@ public final class Settings {
 	public final String dbPassword;
 	public final String dbHost;
 	public final int dbPort;
-	public final String dbSchemaStaging;
-	public final String dbSchemaLive;
-	public final String dbUrlStaging;
-	public final String dbUrlLive;
+	public DatabaseSchema liveSchema;
+	public DatabaseSchema stagingSchema;
+	
+	private final String dbSchemaA;
+	private final String dbSchemaB;
+	private final String dbUrlA;
+	private final String dbUrlB;
 	
 	public final Charset importCharset;
 	
@@ -47,8 +53,8 @@ public final class Settings {
 		dbPassword = b.dbPassword;
 		dbHost = b.dbHost;
 		dbPort = b.dbPort;
-		dbSchemaStaging = b.dbSchemaStaging;
-		dbSchemaLive = b.dbSchemaLive;
+		dbSchemaA = b.dbSchemaA;
+		dbSchemaB = b.dbSchemaB;
 		importCharset = b.importCharset;
 		minThreadPoolSize = b.minThreadPoolSize;
 		maxThreadPoolSize = b.maxThreadPoolSize;
@@ -56,16 +62,16 @@ public final class Settings {
 		hostname = b.hostname;
 		enableRequestLogging = b.enableRequestLogging;
 		
-		if(b.dbUrlStaging == null) {
-			dbUrlStaging = "jdbc:mariadb://" + dbHost + ":" + dbPort + "/" + dbSchemaStaging;
+		if(b.dbUrlA == null) {
+			dbUrlA = "jdbc:mariadb://" + dbHost + ":" + dbPort + "/" + dbSchemaA;
 		} else {
-			dbUrlStaging = b.dbUrlStaging;
+			dbUrlA = b.dbUrlA;
 		}
 		
-		if(b.dbUrlLive == null) {
-			dbUrlLive = "jdbc:mariadb://" + dbHost + ":" + dbPort + "/" + dbSchemaLive;
+		if(b.dbUrlB == null) {
+			dbUrlB = "jdbc:mariadb://" + dbHost + ":" + dbPort + "/" + dbSchemaB;
 		} else {
-			dbUrlLive = b.dbUrlLive;
+			dbUrlB = b.dbUrlB;
 		}
 		
 		if(b.lastDumpMetadataFile == null) {
@@ -73,6 +79,12 @@ public final class Settings {
 		} else {
 			lastDumpMetadataFile = b.lastDumpMetadataFile;
 		}
+	}
+	
+	public void swapDatabases() {
+		DatabaseSchema temp = liveSchema;
+		liveSchema = stagingSchema;
+		stagingSchema = temp;
 	}
 	
 	public static class Builder {
@@ -92,10 +104,11 @@ public final class Settings {
 		public String dbPassword = "cubing";
 		public String dbHost = "localhost";
 		public int dbPort = 3306;
-		public String dbSchemaStaging = "staging";
-		public String dbSchemaLive = "live";
-		public String dbUrlStaging = null;
-		public String dbUrlLive = null;
+		public String dbSchemaA = "cs_a";
+		public String dbSchemaB = "cs_b";
+		public String dbUrlA = null;
+		public String dbUrlB = null;
+		public SchemaAB liveSchema = null;
 		
 		public Charset importCharset = Charset.forName("UTF-8");
 		
@@ -108,8 +121,66 @@ public final class Settings {
 		public Builder() {}
 		
 		public Settings build() {
-			return new Settings(this);
+			Settings s = new Settings(this);
+			if(liveSchema == null)  {
+				if(autodetectLiveStaging(s)) {
+					// Correctly set by autodetectLiveStaging
+				} else {
+					throw new IllegalStateException("Live/staging databases could not be autodetected, please set cs_metadata tables");
+				}
+			}
+			return s;
 		}
+	}
+	
+	public enum SchemaAB {
+		A, B;
+		
+		public static SchemaAB fromString(String s) {
+			if(s.equalsIgnoreCase("A")) {
+				return A;
+			} else if(s.equalsIgnoreCase("B")) {
+				return B;
+			} else {
+				throw new IllegalArgumentException("Invalid SchemaAB string: " + s);
+			}
+		}
+	
+		public SchemaAB opposite() {
+			return this == A ? B : A;
+		}
+	}
+	
+	public static boolean autodetectLiveStaging(Settings settings) {
+		try {
+			Connection connA = DatabaseCSN.getConnection(settings, new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA));
+			Connection connB = DatabaseCSN.getConnection(settings, new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB));
+			ResultSet rsA = connA.prepareStatement("SELECT cs_value FROM cs_metadata WHERE cs_key = \"status\"").executeQuery();
+			ResultSet rsB = connB.prepareStatement("SELECT cs_value FROM cs_metadata WHERE cs_key = \"status\"").executeQuery();
+			
+			if(rsA.next() && rsB.next()) {
+				String statusA = rsA.getString(1);
+				String statusB = rsB.getString(1);
+				if(statusA.equals("live") && statusB.equals("empty")) {
+					settings.liveSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
+					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
+				} else if(statusA.equals("empty") && statusB.equals("live")) {
+					settings.liveSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
+					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
+				} else {
+					System.err.println("Could not autodetect live/staging databases, invalid status values: A='" + statusA + "', B='" + statusB + "'");
+					return false;
+				}
+			} else {
+				System.err.println("Could not autodetect live/staging databases, missing metadata 'status' key");
+				return false;
+			}
+		} catch (SQLException e) {
+			System.err.println("SQL error during live/staging autodetection: " + e.getMessage());
+			return false;
+		}
+		
+		return true;
 	}
 
 }

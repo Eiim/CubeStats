@@ -29,7 +29,7 @@ public class TaskBayesEval extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, DatabaseCSN.DefaultSchema.STAGING);
+			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
 			
 			ResultSet rsEvents = conn.prepareStatement("SELECT event_id, mu_a_0, m_0, alpha_0, theta_0, alep_0, bet_0 FROM cs_bayes_priors").executeQuery();
 			Map<String, Parameters> priors = new TreeMap<>(); // Is TreeMap best here?

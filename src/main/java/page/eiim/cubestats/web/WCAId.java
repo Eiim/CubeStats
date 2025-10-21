@@ -40,6 +40,7 @@ public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, 
 		if(partialId.length() < 10) {
 			partialId = partialId + "0".repeat(10 - partialId.length());
 		}
+		System.out.println("Min prefix '" + partialId + "'");
 		return new WCAId(partialId);
 	}
 	

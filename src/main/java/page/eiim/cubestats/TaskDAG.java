@@ -12,7 +12,7 @@ import java.util.Set;
 
 import page.eiim.cubestats.tasks.Task;
 import page.eiim.cubestats.tasks.TaskCSEvents;
-import page.eiim.cubestats.tasks.TaskCleanupDatabase;
+import page.eiim.cubestats.tasks.TaskPrepareDatabase;
 import page.eiim.cubestats.tasks.TaskGetDumpFiles;
 import page.eiim.cubestats.tasks.TaskImportWCADatabase;
 import page.eiim.cubestats.tasks.TaskPercentiles;
@@ -30,7 +30,7 @@ public class TaskDAG {
 		
 		// Create DAG structure
 		Node getFiles = new Node(new TaskGetDumpFiles(settings));
-		Node cleanupDatabase = new Node(new TaskCleanupDatabase(settings));
+		Node cleanupDatabase = new Node(new TaskPrepareDatabase(settings));
 		Node importDatabase = new Node(new TaskImportWCADatabase(settings));
 		Node calcPercentiles = new Node(new TaskPercentiles(settings));
 		Node csEvents = new Node(new TaskCSEvents(settings));
