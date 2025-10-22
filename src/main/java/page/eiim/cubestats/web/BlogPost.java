@@ -52,10 +52,11 @@ public class BlogPost {
 	 * Where special characters are needed, they will be escaped with a backslash (\)
 	 */
 	private String markdownToHTML(ArrayList<String> lines) {
-		StringBuilder html = new StringBuilder("<div class=\"blogPost\">\n");
+		StringBuilder html = new StringBuilder("<article class=\"blogPost\">\n");
 		
 		html.append("<h1>").append(title).append("</h1>\n");
-		html.append("<h3 class=\"date\">").append(date.format(DateTimeFormatter.ISO_LOCAL_DATE)).append("</h3>\n");
+		String dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+		html.append("<h3><date class=\"date\" datetime=\"").append(dateString).append("\">").append(date).append("</date></h3>\n");
 		if(updated != null) {
 			html.append("<h3 style=\"margin-top:-1em\"><span class=\"blog-italics\">Updated <span class=\"date\">")
 				.append(updated.format(DateTimeFormatter.ISO_LOCAL_DATE))
@@ -110,7 +111,7 @@ public class BlogPost {
 			}
 		}
 		
-		html.append("</div>\n");
+		html.append("</article>\n");
 		return html.toString();
 	}
 	

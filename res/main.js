@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
 	for(e of document.getElementsByClassName("date")) {
 		// Temporal has more consistent formatting, but is too new to be relied upon
 		if("Temporal" in window && "PlainDate" in Temporal) {
-			e.textContent = Temporal.PlainDate.from(e.textContent).toLocaleString()
+			e.textContent = Temporal.PlainDate.from(e.getAttribute("datetime")).toLocaleString()
 		} else {
-			[year, month, day] = e.textContent.split('-');
+			[year, month, day] = e.getAttribute("datetime").split('-');
 			e.textContent = (new Date(+year, month-1, +day)).toLocaleDateString()
 		}
 	}

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class PageBuilder {
 	
@@ -73,6 +74,9 @@ public class PageBuilder {
 				e.printStackTrace();
 			}
 		}
+		
+		// Sort posts by date descending
+		Arrays.sort(blogPosts, (a, b) -> b.date.compareTo(a.date));
 		
 		StringBuilder blogListBuilder = new StringBuilder();
 		for(BlogPost post : blogPosts) {
@@ -156,7 +160,7 @@ public class PageBuilder {
 		
 		public Instance signAndClose() {
 			sb.append("""
-					<p>Made by <a href="https://eiim.page/">Ethan Chapman</a> (<a href="https://www.worldcubeassociation.org/persons/2024CHAP08">2024CHAP08</a>)</p>
+					<footer>Made by <a href="https://eiim.page/">Ethan Chapman</a> (<a href="https://www.worldcubeassociation.org/persons/2024CHAP08">2024CHAP08</a>)</footer>
 					</div>
 					</div>
 					</body>

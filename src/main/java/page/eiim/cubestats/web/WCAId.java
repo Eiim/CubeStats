@@ -1,7 +1,5 @@
 package page.eiim.cubestats.web;
 
-import java.util.Objects;
-
 public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, byte count) implements Comparable<WCAId> {
 	public WCAId(String id) {
 		if(id.length() != 10) throw new IllegalArgumentException("WCA ID must be 10 characters long");
@@ -35,8 +33,18 @@ public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, 
 	}
 	
 	@Override
+	/*
+	 * Reasonably-optimized hash code implementation to minimize collisions in our specific case
+	 * Note that 1982 IDs may collide with 2014 IDs, so this is not a unique hash
+	 * Theoretically could be made unique by reducing the three name characters to 19 bits total instead of 20
+	 */
 	public int hashCode() {
-		return Objects.hash(count, name1, name2, name3, name4, year); // TODO: see if there's a better way to hash 7 bytes
+		return (name1 & 0b00011111) |
+				(name2 & 0b00011111) << 5 |
+				(name3 & 0b00011111) << 10 |
+				(name4 & 0b00011111) << 15 |
+				(count & 0b01111111) << 20 |
+				(year & 0b00011111) << 27;
 	}
 	
 	@Override

@@ -26,3 +26,6 @@ replay_pid*
 # Gradle
 .gradle/
 build/
+
+# Auto-built static files
+/res/blog/*.html
