@@ -138,9 +138,10 @@ public class Main {
 				if(status.get() == SystemStatus.DATA_READY) {
 					System.out.println("Shutting down web server for data transition.");
 					if(server.shutdown()) {
-						settings.swapDatabases();
 						TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
+						System.out.println("Migrating database...");
 						migrateTask.run();
+						settings.swapDatabases();
 						server = new MainServer(settings, networking);
 						server.start();
 						status.set(SystemStatus.NORMAL);
