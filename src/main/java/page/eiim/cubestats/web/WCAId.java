@@ -1,5 +1,7 @@
 package page.eiim.cubestats.web;
 
+import java.util.Objects;
+
 public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, byte count) implements Comparable<WCAId> {
 	public WCAId(String id) {
 		if(id.length() != 10) throw new IllegalArgumentException("WCA ID must be 10 characters long");
@@ -11,10 +13,12 @@ public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, 
 		byte count = Byte.parseByte(id.substring(8, 10));
 		this(year, name1, name2, name3, name4, count);
 	}
+	
 	@Override
 	public String toString() {
 		return String.format("%04d%c%c%c%c%02d", year, name1, name2, name3, name4, count);
 	}
+	
 	@Override
 	public int compareTo(WCAId o) {
 		int cmp = this.year - o.year;
@@ -30,6 +34,22 @@ public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, 
 		return this.count - o.count;
 	}
 	
+	@Override
+	public int hashCode() {
+		return Objects.hash(count, name1, name2, name3, name4, year); // TODO: see if there's a better way to hash 7 bytes
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof WCAId))
+			return false;
+		WCAId other = (WCAId) obj;
+		return count == other.count && name1 == other.name1 && name2 == other.name2 && name3 == other.name3
+				&& name4 == other.name4 && year == other.year;
+	}
+	
 	public static WCAId minPrefix(String partialId) {
 		if(partialId.length() < 4) {
 			partialId = partialId + "0".repeat(4 - partialId.length());
@@ -40,7 +60,9 @@ public record WCAId(short year, byte name1, byte name2, byte name3, byte name4, 
 		if(partialId.length() < 10) {
 			partialId = partialId + "0".repeat(10 - partialId.length());
 		}
-		System.out.println("Min prefix '" + partialId + "'");
+		if(!isValid(partialId)) {
+			throw new IllegalArgumentException("Invalid WCA ID prefix");
+		}
 		return new WCAId(partialId);
 	}
 	

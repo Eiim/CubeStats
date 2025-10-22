@@ -97,7 +97,7 @@ public class CubeSearch {
 		if(includePersons && query.length() <= 10) {
 			try {
 				WCAId higherWcaId = personIds.ceiling(WCAId.minPrefix(query));
-				while(queryResults.size() < maxResults && higherWcaId != null && higherWcaId.toString().startsWith(query)) {
+				while(queryResults.size() < maxResults && higherWcaId != null && higherWcaId.toString().toLowerCase().startsWith(query)) {
 					queryResults.add(new QueryResult(higherWcaId.toString(), ResultType.PERSON));
 					higherWcaId = personIds.higher(higherWcaId);
 				}
