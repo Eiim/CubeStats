@@ -146,7 +146,7 @@ public class CubeSearch {
 	public static void main(String[] args) {
 		CubeSearch cs;
 		try {
-			Connection conn = DatabaseConnector.getConnection("cubestats", "cubing", "jdbc:mariadb://localhost:3306/live");
+			Connection conn = DatabaseConnector.getConnection("cubestats", "cubing", "jdbc:mariadb://localhost:3306/cs_b");
 			cs = new CubeSearch(conn);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

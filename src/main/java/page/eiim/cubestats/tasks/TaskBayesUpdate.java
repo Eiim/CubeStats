@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,8 +15,9 @@ import page.eiim.cubestats.Settings;
 
 public class TaskBayesUpdate extends Task {
 	
-	private static final double A = 0.2;
-	private static final double B = 15;
+	private static final double A = 0.05;
+	private static final double B = 30;
+	private static final double EXP = 0.25;
 	
 	public TaskBayesUpdate(Settings settings) {
 		super(settings);
@@ -152,20 +154,20 @@ public class TaskBayesUpdate extends Task {
 		}
 	}
 	
-	private static double[] calculateWeights(ArrayList<LocalDate> dates) {
+	private static double[] calculateWeights(List<LocalDate> dates) {
 		long mostRecent = dates.get(dates.size() - 1).toEpochDay();
 		double[] weights = new double[dates.size()];
-		//ArrayList<Double> weights = new ArrayList<>(dates.size());
 		double sum = 0;
+		double totalWeight = Math.pow(dates.size(), EXP);
 		for(int i = 0; i < dates.size(); i++) {
 			long days = mostRecent - dates.get(i).toEpochDay();
-			//int solves = dates.size() - i;
-			//double weight = days == 0 ? 1.0 : 0.0;
-			double weight = 1.0 / (1.0 + Math.exp(A*(days - B)));
+			int solves = dates.size() - i;
+			double weight = 1.0 / (1.0 + Math.exp(A*(days + solves - B)));
 			sum += weight;
 			weights[i] = weight;
 		}
 		// Normalize weights
+		sum /= totalWeight;
 		for(int i = 0; i < weights.length; i++) {
 			weights[i] /= sum;
 		}

@@ -26,12 +26,11 @@ public final class DistrMath {
 	}
 	
 	// logGamma(x+.5) - logGamma(x)
-	// Faster and lower error for x >= 1 (worst-case absolute error ~-.000018 @ x ~= 1.193)
+	// Faster and lower error for x >= 1 (worst-case absolute error ~-.0000076 @ x ~= 1.20059)
 	// Should almost never need to be used for x < 1
 	public static double logGammaDiff(double x) {
 		if(x >= 1) {
-			Math.exp(1.0);
-			return 0.5 * Math.log(x) - 0.125/x + 0.00422681*Math.pow(x, -2.762); // Pow is expensive, consider alternatives
+			return .43429*(0.5 * Math.log(x) - 0.125/x + 0.00422681*Math.pow(x, -2.762)); // Pow is expensive, consider alternatives
 		} else { // Haven't found a better approximation for x < 1 yet, and it's probably not needed
 			return logGamma(x + 0.5) - logGamma(x);
 		}

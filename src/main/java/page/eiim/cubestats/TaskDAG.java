@@ -11,11 +11,14 @@ import java.util.Queue;
 import java.util.Set;
 
 import page.eiim.cubestats.tasks.Task;
+import page.eiim.cubestats.tasks.TaskBayesEval;
+import page.eiim.cubestats.tasks.TaskBayesPriors;
+import page.eiim.cubestats.tasks.TaskBayesUpdate;
 import page.eiim.cubestats.tasks.TaskCSEvents;
-import page.eiim.cubestats.tasks.TaskPrepareDatabase;
 import page.eiim.cubestats.tasks.TaskGetDumpFiles;
 import page.eiim.cubestats.tasks.TaskImportWCADatabase;
 import page.eiim.cubestats.tasks.TaskPercentiles;
+import page.eiim.cubestats.tasks.TaskPrepareDatabase;
 
 public class TaskDAG {
 
@@ -25,8 +28,9 @@ public class TaskDAG {
 		List<Node> roots = new ArrayList<>();
 		
 		// Test single task
-		//Node task = new Node(new TaskCSEvents(settings));
+		//Node task = new Node(new TaskBayesUpdate(settings));
 		//roots.add(task);
+		
 		
 		// Create DAG structure
 		Node getFiles = new Node(new TaskGetDumpFiles(settings));
@@ -34,17 +38,24 @@ public class TaskDAG {
 		Node importDatabase = new Node(new TaskImportWCADatabase(settings));
 		Node calcPercentiles = new Node(new TaskPercentiles(settings));
 		Node csEvents = new Node(new TaskCSEvents(settings));
+		Node priors = new Node(new TaskBayesPriors(settings));
+		Node update = new Node(new TaskBayesUpdate(settings));
+		Node eval = new Node(new TaskBayesEval(settings));
 		//Node calcNemeses = new Node(new TaskNemesize(settings));
 		
 		getFiles.dependents.add(importDatabase);
 		cleanupDatabase.dependents.add(importDatabase);
 		importDatabase.dependents.add(calcPercentiles);
 		importDatabase.dependents.add(csEvents);
+		csEvents.dependents.add(priors);
+		priors.dependents.add(update);
+		update.dependents.add(eval);
 		//calcPercentiles.dependents.add(calcNemeses);
 		//csEvents.dependents.add(calcNemeses);
 		
 		roots.add(getFiles);
 		roots.add(cleanupDatabase);
+		
 		
 		Map<Node, Integer> levels = calculateLevels(roots);
 		nodes = new ArrayList<>(levels.keySet());
