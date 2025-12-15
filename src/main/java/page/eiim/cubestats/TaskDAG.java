@@ -11,7 +11,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import page.eiim.cubestats.tasks.Task;
-import page.eiim.cubestats.tasks.TaskBayesEval;
 import page.eiim.cubestats.tasks.TaskBayesPriors;
 import page.eiim.cubestats.tasks.TaskBayesUpdate;
 import page.eiim.cubestats.tasks.TaskCSEvents;
@@ -40,7 +39,7 @@ public class TaskDAG {
 		Node csEvents = new Node(new TaskCSEvents(settings));
 		Node priors = new Node(new TaskBayesPriors(settings));
 		Node update = new Node(new TaskBayesUpdate(settings));
-		Node eval = new Node(new TaskBayesEval(settings));
+		//Node eval = new Node(new TaskBayesEval(settings));
 		//Node calcNemeses = new Node(new TaskNemesize(settings));
 		
 		getFiles.dependents.add(importDatabase);
@@ -49,7 +48,7 @@ public class TaskDAG {
 		importDatabase.dependents.add(csEvents);
 		csEvents.dependents.add(priors);
 		priors.dependents.add(update);
-		update.dependents.add(eval);
+		//update.dependents.add(eval);
 		//calcPercentiles.dependents.add(calcNemeses);
 		//csEvents.dependents.add(calcNemeses);
 		

@@ -25,6 +25,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import com.google.gson.JsonObject;
 
 import page.eiim.cubestats.Settings;
+import page.eiim.cubestats.web.PageBuilder.ResourceCategory;
 
 public class MainServer {
 	
@@ -86,7 +87,7 @@ public class MainServer {
 				if (message == null)
 					message = HttpStatus.getMessage(code);
 				writer.write(PageBuilder.getInstance()
-							.buildHead(message, code+" "+message, false)
+							.buildHead(message, code+" "+message, ResourceCategory.NONE)
 							.startBody()
 							.addLogo()
 							.enterMain()

@@ -26,7 +26,7 @@ public class PageBuilder {
 		
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(resourcesRoot, "index.html")))) {
 			writer.write(new Instance()
-					.buildHead("CubeStats", "Some statistical analysis of WCA cubing results: under construction", false)
+					.buildHead("CubeStats", "Some statistical analysis of WCA cubing results: under construction", ResourceCategory.NONE)
 					.addSidebar()
 					.startBody()
 					.addLogo()
@@ -62,7 +62,7 @@ public class PageBuilder {
 			File postFile = new File(blogRoot, post.path + ".html");
 			try (BufferedWriter writer = new BufferedWriter(new FileWriter(postFile))) {
 				writer.write(new Instance()
-						.buildHead(post.title + " - CubeStats", post.title, false)
+						.buildHead(post.title + " - CubeStats", post.title, ResourceCategory.BLOG)
 						.addSidebar()
 						.startBody()
 						.addLogo()
@@ -92,7 +92,7 @@ public class PageBuilder {
 		File blogIndexFile = new File(blogRoot, "index.html");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(blogIndexFile))) {
 			writer.write(new Instance()
-					.buildHead("Blog - CubeStats", "A data science blog about speedcubing analysis", false)
+					.buildHead("Blog - CubeStats", "A data science blog about speedcubing analysis", ResourceCategory.BLOG)
 					.addSidebar()
 					.startBody()
 					.addLogo()
@@ -116,11 +116,18 @@ public class PageBuilder {
 		
 		public Instance() {}
 		
-		public Instance buildHead(String title, String description, boolean useIcons) {
+		public Instance buildHead(String title, String description, ResourceCategory category) {
 			if(title == null) title = "CubeStats";
 			sb.append(PageBuilder.HTML_START).append("<title>").append(title).append("</title>\n");
 			if(description != null) sb.append("<meta name=\"description\" content=\"").append(description).append("\">\n");
-			if(useIcons) sb.append("<link rel=\"stylesheet\" href=\"https://cdn.cubing.net/v0/css/@cubing/icons/css\">\n");
+			switch(category) {
+				case NONE -> {}
+				case BLOG -> sb.append("<link rel=\"stylesheet\" href=\"/blog.css\">\n");
+				case PERSON -> {
+					sb.append("<link rel=\"stylesheet\" href=\"/person.css\">\n");
+					//sb.append("<link rel=\"stylesheet\" href=\"https://cdn.cubing.net/v0/css/@cubing/icons/css\">\n");
+				}
+			}
 			sb.append("</head>\n<body>\n");
 			return this;
 		}
@@ -179,5 +186,9 @@ public class PageBuilder {
 			sb.setLength(0);
 			return result;
 		}
+	}
+	
+	public static enum ResourceCategory {
+		NONE, BLOG, PERSON;
 	}
 }

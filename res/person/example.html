@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/main.css">
+<link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script src="/main.js"></script>
+<script src="/tcdf.js"></script>
+<script>
+const params = {
+	"333": {
+		mu: 7.92837355,
+		m: 2.11886212,
+		alpha: 3.35617613,
+		theta: 0.15548729,
+		alep: 1.17931880,
+		bet: 87.81810891
+	},
+	"clock": {
+		mu: 7.9283599,
+		m: 1.4925,
+		alpha: 2.442592,
+		theta: 0.196218,
+		alep: 5.50278,
+		bet: 42.69549
+	}
+};
+curEvent = "333";
+</script>
+<script src="/person.js"></script>
+<title>Ethan Chapman - CubeStats</title>
+<meta name="description" content="Statistical analysis of Ethan Chapman's WCA cubing results">
+<link rel="stylesheet" href="/person.css">
+</head>
+<body>
+<div id="sidebarToggle">☰</div>
+<div id="sidebar">
+	<div class="sidebarEntry"><a href="/">Coming Soon</a></div>
+	<div class="sidebarEntry"><a href="/blog">Blog</a></div>
+</div>
+<div id="bodyContainer">
+<div class="bg-tile"></div>
+<a href="/"><div id="logoBox">
+	<img src="/logo_responsive.svg" alt="CubeStats Logo"/>
+</div></a>
+<div id="main">
+	<div id="personHeader">
+		<div id="personImg"><img src="https://avatars.worldcubeassociation.org/muzu9vzkx9w9z33g2iq2zp6vc1sq"/></div>
+		<div id="personRef"><div id="personName">Ethan Chapman</div><div id="personId">2024CHAP08</div></div>
+		<a id="personLink" href="https://www.worldcubeassociation.org/persons/2024CHAP08"><img src="/wca_responsive.svg"/></a>
+	</div>
+	<div id="personEventSelector">
+		<button class="selectorEvent selEv222" onclick="setEvent('222')"></button>
+		<button class="selectorEvent selEv333 selEvSelected" onclick="setEvent('333')"></button>
+		<button class="selectorEvent selEvClock" onclick="setEvent('clock')"></button>
+		<button class="selectorEvent selEvPyram"></button>
+		<button class="selectorEvent selEvSkewb"></button>
+	</div>
+	<div id="cumulativeDiv">
+		<input type="checkbox" id="cumulativeInput">
+		<label for="cumulativeInput">Cumulative distribution</label>
+	</div>
+	<div id="timeGraph">
+		<div id="tgAxisY">
+			<div id="tgAxisYLabel">Probability of getting time</div>
+			<div id="tgAxisYTicks">
+				<div class="tgAxisYTick"><span>0.04</span><div></div></div>
+				<div class="tgAxisYTick"><span>0.03</span><div></div></div>
+				<div class="tgAxisYTick"><span>0.02</span><div></div></div>
+				<div class="tgAxisYTick"><span>0.01</span><div></div></div>
+				<div class="tgAxisYTick"><span>0</span><div></div></div>
+			</div>
+		</div>
+		<div id="tgAxisX">
+			<div id="tgAxisXTicks">
+				<div class="tgAxisXTick"><div></div><span>0s</span></div>
+				<div class="tgAxisXTick"><div></div><span>10s</span></div>
+				<div class="tgAxisXTick"><div></div><span>20s</span></div>
+				<div class="tgAxisXTick"><div></div><span>30s</span></div>
+				<div class="tgAxisXTick"><div></div><span>40s</span></div>
+			</div>
+		</div>
+		<div id="tgChartArea">
+			<svg viewBox="0 0 1000 600" style="display:block">
+				<polyline fill="none" stroke="var(--brand-orange") stroke-width="3px" points="0,600 100,500 175,100 220,0 265,100 320,300 425,500 500,550 700,585 1000,600"/>
+				<polygon fill="var(--brand-orange)" fill-opacity=".25" points="0,600 100,500 175,100 220,0 265,100 320,300 425,500 500,550 700,585 1000,600 1000,610 0,610"/>
+			</svg>
+			<div id="tgChartTooltip">hi</div>
+		</div>
+	</div>
+	<div id="stats">
+		<div><div>Median Time</div><div id="medianTime"></div></div>
+		<div><div>Est. DNF Rate</div><div id="dnfRate"></div></div>
+	</div>
+	<footer>Made by <a href="https://eiim.page/">Ethan Chapman</a> (<a href="https://www.worldcubeassociation.org/persons/2024CHAP08">2024CHAP08</a>)</footer>
+</div>
+</div>
+</body>
+</html>
