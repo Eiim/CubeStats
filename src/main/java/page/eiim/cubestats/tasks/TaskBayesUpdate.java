@@ -143,6 +143,10 @@ public class TaskBayesUpdate extends Task {
 				}
 			}
 			
+			// Create index over person_id
+			// Eats a few megs but speeds up lookups massively
+			conn.prepareStatement("CREATE INDEX idx_person ON cs_bayes_params (person_id)").executeUpdate();
+			
 			result = new TaskResult(true, "Finished updating Bayesian parameters");
 			isDone = true;
 			return;

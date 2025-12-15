@@ -72,6 +72,9 @@ public class MainServer {
 			ContextHandler searchHandler = new ContextHandler(new SearchHandler(cubeSearch), "/searchapi");
 			searchHandler.setAllowNullPathInContext(true);
 			contextHandlers.addHandler(searchHandler);
+			PersonHandler personHandler = new PersonHandler(DatabaseConnector.getConnection(settings.dbUserName, settings.dbPassword, settings.liveSchema.url()));
+			ContextHandler cph = new ContextHandler(personHandler, "/person");
+			contextHandlers.addHandler(cph);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
