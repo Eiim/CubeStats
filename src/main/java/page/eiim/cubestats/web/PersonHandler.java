@@ -30,11 +30,12 @@ public class PersonHandler extends Handler.Abstract.NonBlocking {
 		this.conn = conn;
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement("SELECT id, rank FROM events");
+			PreparedStatement ps = conn.prepareStatement("SELECT id, is_wca, is_active FROM cs_events");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()) {
-				int rank = rs.getInt(2);
-				if(rank < 900) {
+				boolean isWCA = rs.getBoolean(2);
+				boolean isActive = rs.getBoolean(3);
+				if(isWCA && isActive) {
 					validEventIds.add(rs.getString(1));
 				}
 			}

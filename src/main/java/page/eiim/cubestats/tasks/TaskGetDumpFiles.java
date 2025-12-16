@@ -15,21 +15,16 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import page.eiim.cubestats.Settings;
 
 public class TaskGetDumpFiles extends Task {
 
-	private final String exportMetadataUrl;
 	private String databaseDumpUrl;
 	private final String userAgent;
 	private final File dataDirectory;
 	
 	public TaskGetDumpFiles(Settings settings) {
 		synchronized (settings) {
-			exportMetadataUrl = settings.exportMetadataUrl;
 			databaseDumpUrl = settings.databaseDumpUrl;
 			userAgent = settings.userAgent;
 			dataDirectory = settings.dataDirectory;
@@ -43,22 +38,6 @@ public class TaskGetDumpFiles extends Task {
 
 	@Override
 	public void run() {
-		// Get URL of database dump from metadata URL
-		try {
-			HttpURLConnection metadataConnection = (HttpURLConnection) new URI(exportMetadataUrl).toURL().openConnection();
-			metadataConnection.setRequestProperty("User-Agent", userAgent);
-			String jsonString = new String(metadataConnection.getInputStream().readAllBytes(), Charset.forName("UTF-8")); // Assume UTF-8 (probably will only ever be ASCII)
-			JsonObject metadata = JsonParser.parseString(jsonString).getAsJsonObject();
-			
-			databaseDumpUrl = metadata.get("developer_url").getAsString();
-			
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-			result = new TaskResult(false, e.getMessage());
-			isDone = true;
-			return;
-		}
-		
 		System.out.println("Downloading database dump from " + databaseDumpUrl);
 		try {
 			HttpURLConnection dumpConnection = (HttpURLConnection) new URI(databaseDumpUrl).toURL().openConnection();

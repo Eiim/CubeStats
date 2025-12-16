@@ -63,7 +63,6 @@ public class Main {
 				
 				switch(key) {
 					case "networking" -> networking = value.getAsJsonObject();
-					case "export_metadata_url" -> sb.exportMetadataUrl = value.getAsString();
 					case "database_dump_url" -> sb.databaseDumpUrl = value.getAsString();
 					case "user_agent" -> sb.userAgent = value.getAsString();
 					case "data_directory" -> sb.dataDirectory = new File(value.getAsString());
@@ -189,7 +188,6 @@ public class Main {
 		
 		System.out.println();
 		System.out.println("Advanced options (only change if there's a problem and you know what you're doing!):");
-		System.out.println("--export_metadata_url\t\tWCA export API URL");
 		System.out.println("--database_dump_url\t\tURL for the WCA database dump. If unset, found from the metadata file.");
 		System.out.println("--user_agent\t\t\tUser-Agent header to use for HTTP requests");
 		System.out.println("--last_dump_metadata_file\tMetadata file for the last downloaded database dump. Defaults to lastDumpMetadata.txt in the data directory");

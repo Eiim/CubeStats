@@ -11,7 +11,6 @@ public final class Settings {
 	public final boolean noImport;
 	public final boolean noWebserver;
 	
-	public final String exportMetadataUrl;
 	public final String databaseDumpUrl;
 	public final String userAgent;
 	public final File dataDirectory;
@@ -42,7 +41,6 @@ public final class Settings {
 	private Settings(Builder b) {
 		noImport = b.noImport;
 		noWebserver = b.noWebserver;
-		exportMetadataUrl = b.exportMetadataUrl;
 		databaseDumpUrl = b.databaseDumpUrl;
 		userAgent = b.userAgent;
 		dataDirectory = b.dataDirectory;
@@ -89,7 +87,6 @@ public final class Settings {
 		public boolean noImport = false;
 		public boolean noWebserver = false;
 		
-		public String exportMetadataUrl = "https://www.worldcubeassociation.org/api/v0/export/public";
 		public String databaseDumpUrl = "https://assets.worldcubeassociation.org/export/developer/wca-developer-database-dump.zip";
 		public String userAgent = "CubeStatsBot/0.1";
 		public File dataDirectory = null; // Must be set
