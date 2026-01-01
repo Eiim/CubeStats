@@ -162,6 +162,7 @@ public class SearchHandler extends Handler.Abstract.NonBlocking {
 			response.write(true, null, callback);
 		} else {
 			response.setStatus(200);
+			response.getHeaders().put("Content-Type", "application/json");
 			response.write(true, ByteBuffer.wrap(resultString.getBytes(UTF8)), callback);
 		}
 		
