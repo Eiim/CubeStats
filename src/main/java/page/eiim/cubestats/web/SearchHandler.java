@@ -162,6 +162,11 @@ public class SearchHandler extends Handler.Abstract.NonBlocking {
 			response.write(true, null, callback);
 		} else {
 			response.setStatus(200);
+			if(form.equals("wca_url")) {
+				response.getHeaders().put("Content-Type", "text/plain; charset=utf-8");
+			} else {
+				response.getHeaders().put("Content-Type", "application/json; charset=utf-8");
+			}
 			response.write(true, ByteBuffer.wrap(resultString.getBytes(UTF8)), callback);
 		}
 		
