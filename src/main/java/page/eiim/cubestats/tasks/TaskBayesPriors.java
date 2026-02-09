@@ -48,7 +48,7 @@ public class TaskBayesPriors extends Task {
 				dnfRates.put(event, new ArrayList<>());
 			}
 			
-			ResultSet rs = conn.prepareStatement("SELECT person_id, event_id, value1, value2, value3, value4, value5 FROM results ORDER BY person_id, event_id ASC").executeQuery();
+			ResultSet rs = conn.prepareStatement("SELECT result_attempts.value, results.person_id, results.event_id FROM result_attempts LEFT JOIN results ON result_attempts.result_id=results.id ORDER BY person_id, event_id ASC").executeQuery();
 			
 			System.out.println("Getting results...");
 			
@@ -57,8 +57,9 @@ public class TaskBayesPriors extends Task {
 			ArrayList<Double> times = new ArrayList<>();
 			int dnfs = 0;
 			while(rs.next()) {
-				String person = rs.getString(1);
-				String event = rs.getString(2);
+				String person = rs.getString(2);
+				if(person == null) continue; // Some result attempts are not associated with a result
+				String event = rs.getString(3);
 				if(!event.equals(currentEvent) || !person.equals(currentPerson)) {
 					if(!times.isEmpty() && !eventsToSkip.contains(currentEvent)) {
 						// Process previous event
@@ -87,13 +88,11 @@ public class TaskBayesPriors extends Task {
 					times.clear();
 					dnfs = 0;
 				}
-				for(int i = 3; i <= 7; i++) {
-					int time = rs.getInt(i);
-					if(time > 0) {
-						times.add(Math.log(time));
-					} else if(time == -1) { // DNF
-						dnfs++;
-					}
+				int time = rs.getInt(1);
+				if(time > 0) {
+					times.add(Math.log(time));
+				} else if(time == -1) { // DNF
+					dnfs++;
 				}
 			}
 			

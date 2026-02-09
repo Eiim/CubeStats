@@ -1,12 +1,232 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="bin/main" path="src/main/java">
+	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
+	<classpathentry kind="output" path="bin/default"/>
+	<classpathentry output="bin/main" kind="src" path="src/main/java">
 		<attributes>
 			<attribute name="gradle_scope" value="main"/>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-25/"/>
-	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
-	<classpathentry kind="output" path="bin/default"/>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.13.1/291e19613797898e0b2ba95553c874c1d07e00c1/gson-2.13.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.13.1/853ce06c11316b33a8eae5e9095da096a9528b8f/gson-2.13.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.mariadb.jdbc/mariadb-java-client/3.5.5/2a0b840d07e01ffd04c56bd6f8e7b389c84a5d10/mariadb-java-client-3.5.5-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.mariadb.jdbc/mariadb-java-client/3.5.5/6bf65580b566bd8123319dd69c6a7faf1811f03b/mariadb-java-client-3.5.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.compression/jetty-compression-server/12.1.1/e40e3c1d7132a4eddae78983b3ff22543a8aa0a4/jetty-compression-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.compression/jetty-compression-server/12.1.1/ba665d5e914e097aff9c3d586f9dfd6efea49881/jetty-compression-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http2/jetty-http2-server/12.1.1/f87d0912aae791007f24a55704a4f9b6c40042dc/jetty-http2-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http2/jetty-http2-server/12.1.1/332ed5808b8c24e38d4cd4e9125fa476b802de97/jetty-http2-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-alpn-java-server/12.1.1/5c3f5b90c4700d38ea808df0c0fbcc46a1927fcd/jetty-alpn-java-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-alpn-java-server/12.1.1/9d0a08d2264a3b69f0ac4d469758f4cc9b7e6575/jetty-alpn-java-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-alpn-server/12.1.1/a9ab501256779e5ed92964b6c1fd56e5992fcc53/jetty-alpn-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-alpn-server/12.1.1/1105f4ef22a16d41da37f8fa48e7f623c2711d02/jetty-alpn-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http3/jetty-http3-server/12.1.1/1548684175e0d6358084babd62fa6fbe385543f1/jetty-http3-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http3/jetty-http3-server/12.1.1/7fa3d55dcddd9ffcac7fda1731890620fc9a61d1/jetty-http3-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-quiche-server/12.1.1/b66f588243f882b08b1d0041a5ee60d3e184097c/jetty-quic-quiche-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-quiche-server/12.1.1/e734a7be369575b2b9b5553180ab90e081c2f55e/jetty-quic-quiche-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-server/12.1.1/1c14e4f9cea43e0cd0e23fac210576dc0ff62fd6/jetty-quic-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-server/12.1.1/8afea5fc1c055174a8df3ddf6bd57db43f836281/jetty-quic-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-server/12.1.1/e1104464b40cf87eda4180d6eaa941d56156e0c4/jetty-server-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-server/12.1.1/4a34529a4737bcc4868186914a72a097edee1a52/jetty-server-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-slf4j2-impl/2.25.1/9a76e3d0c4c76db7b1392cf74430939690ecd2df/log4j-slf4j2-impl-2.25.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-slf4j2-impl/2.25.1/a5ed4c3e2effa2575a4dde13f9101bfe23ccfb1a/log4j-slf4j2-impl-2.25.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.25.1/c0891d6097a8e53efa51e23e4a188d74fdca2309/log4j-core-2.25.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.25.1/32b3a228d5a30a4528b6c7354fe6cff9524d89e7/log4j-core-2.25.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.25.1/f1bd2b6b4dbef267bef2758374f3b3b181fc0f61/log4j-api-2.25.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.25.1/c7acbbd6f110cd1457c628da46245e355b1ee57a/log4j-api-2.25.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.38.0/89b24f7eb69d776239d46ae4979e3d61a0784a9/error_prone_annotations-2.38.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.38.0/fc0ae991433e8590ba51cd558421478318a74c8c/error_prone_annotations-2.38.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.compression/jetty-compression-common/12.1.1/7656d25aba2a0aa317afe74f6b9f525ef020cbb2/jetty-compression-common-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.compression/jetty-compression-common/12.1.1/5805d5ff32f6c46535b415e43d5ec33b65db7b8e/jetty-compression-common-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http2/jetty-http2-common/12.1.1/78d6ea2a69f8a5618430b195ea2a05065b3192b7/jetty-http2-common-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http2/jetty-http2-common/12.1.1/4bd97d16a33890e29db1a4f5247b6bd0cc364681/jetty-http2-common-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http2/jetty-http2-hpack/12.1.1/21aa824aeab8c61225dc641204e2159854acefa1/jetty-http2-hpack-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http2/jetty-http2-hpack/12.1.1/9ba61fa5f598a3990852a385336378def4e81f48/jetty-http2-hpack-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http3/jetty-http3-common/12.1.1/3384cb595dc56f6a86bb90db3cd4f42f9f42f68b/jetty-http3-common-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http3/jetty-http3-common/12.1.1/47e39370172ba4a1d13156c1b5d4a214c5e43ab9/jetty-http3-common-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http3/jetty-http3-qpack/12.1.1/3d604c95d08b2c02dc9f2869219eca6e97ecda64/jetty-http3-qpack-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.http3/jetty-http3-qpack/12.1.1/ecaf8120a4d9beb0f6c86ea84dd6c2ac3a654016/jetty-http3-qpack-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-http/12.1.1/faf1ec8e0d46f7ce3129218f77420ac36855a64b/jetty-http-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-http/12.1.1/4c087942e5cdaf4b716146312f9ff4c5a1e289d9/jetty-http-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-quiche-common/12.1.1/f4d01c3c2dafe311663e340f28e9f721bfcef755/jetty-quic-quiche-common-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-quiche-common/12.1.1/c49d857eaefd876cd864a2b699296a227cfc187/jetty-quic-quiche-common-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-common/12.1.1/840187e1cc00f91a20d716a0a145227af7406770/jetty-quic-common-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-common/12.1.1/4ddf9b7b2d289a2b75828f645b1f1995b32c4f21/jetty-quic-common-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-api/12.1.1/aa4b1ef15369ebc388614e93ace4e4af8f73d270/jetty-quic-api-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-api/12.1.1/380cb8c3c1fda9be04bb01944e3ffb113eade26a/jetty-quic-api-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-io/12.1.1/598cf5a768448d870ea7e2e0a364adbaed471753/jetty-io-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-io/12.1.1/f9efcb4d69ee757721c5f0f3bf4cd55b48a44b48/jetty-io-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-util/12.1.1/62f630280b411f265e65c517fca407d978844293/jetty-util-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-util/12.1.1/582a66cbad2b577ad11b7945e434bd5732c1e45d/jetty-util-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.17/d7da5e7fecb3544b1e32f86dc0ef5d5ecf9f381b/slf4j-api-2.0.17-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.17/d9e58ac9c7779ba3bf8142aff6c830617a7fe60f/slf4j-api-2.0.17.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.jspecify/jspecify/1.0.0/f1a67bbcf2f9f282baf3821046563983f16ca9b2/jspecify-1.0.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.jspecify/jspecify/1.0.0/7425a601c1c7ec76645a78d22b8c6a627edee507/jspecify-1.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/biz.aQute.bnd/biz.aQute.bnd.annotation/7.1.0/b8a7ac832557135627337fbef68c0fb6b2a306f9/biz.aQute.bnd.annotation-7.1.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/biz.aQute.bnd/biz.aQute.bnd.annotation/7.1.0/2f2be18c936d08cf46ea6cfa0043f34afdf38705/biz.aQute.bnd.annotation-7.1.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.annotation.bundle/2.0.0/833f1460ce117037e9239eaf6a352eef5abf36f6/org.osgi.annotation.bundle-2.0.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.annotation.bundle/2.0.0/f5c2cd6e670c3c5d440d3003efd5ef2ead5c68eb/org.osgi.annotation.bundle-2.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.annotation.versioning/1.1.2/e6df443d6fbda19c147f7b82171007de8d62471b/org.osgi.annotation.versioning-1.1.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.annotation.versioning/1.1.2/dc3cd4ec96c0b3c5459fe00694bd73a816ecf93e/org.osgi.annotation.versioning-1.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.github.spotbugs/spotbugs-annotations/4.8.6/62e2cc9cfe009786e8f7b5ac6421668cb8a62b1/spotbugs-annotations-4.8.6-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.github.spotbugs/spotbugs-annotations/4.8.6/1dcffed3e561ed32134a0dff4717f19bc2fdf4d8/spotbugs-annotations-4.8.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.mortbay.jetty.quiche/jetty-quiche-native/0.24.5/995a1d53c26af1e55d253377d20bd12f7ff34720/jetty-quiche-native-0.24.5-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.mortbay.jetty.quiche/jetty-quiche-native/0.24.5/177fc607b6d0ec5a138c93b37dd302bb73a6ae82/jetty-quiche-native-0.24.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.resource/1.0.0/506ee97481879484d9b76b4169d627396172cc37/org.osgi.resource-1.0.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.resource/1.0.0/343c88949132984b3f2d4175a72c40b77dc65619/org.osgi.resource-1.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.service.serviceloader/1.0.0/e5f6e4bb20e1bdced26b2ba0ea55db2d027e330f/org.osgi.service.serviceloader-1.0.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.service.serviceloader/1.0.0/3728ff37909c6a3c1870b3e851342d9f2bd3cc63/org.osgi.service.serviceloader-1.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/b19b5927c2c25b6c70f093767041e641ae0b1b35/jsr305-3.0.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-util/12.1.1/3a2bfe46cb10b8349df4d4a1cf1e72fe0a910e07/jetty-quic-util-12.1.1-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.quic/jetty-quic-util/12.1.1/b1663741d3c2fe691ed0e239dbea558a2f1b5c16/jetty-quic-util-12.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.13.2/2ec80b9f7be12bf570e13180146bf1facca43f7/junit-jupiter-params-5.13.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.13.2/4aa4b2c6c033c8b27d7d70ab8dcfc83888497c2b/junit-jupiter-params-5.13.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.13.2/546e0d5d69408058ac71ffef0c6bad283b29d51e/junit-jupiter-api-5.13.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.13.2/a36d0f2a94ebf876f75d92f77b4f56ed6b609386/junit-jupiter-api-5.13.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.13.2/fd631b3b50d438253c07a3d9b37b63d409449ad7/junit-platform-commons-1.13.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.13.2/bd56a07f5c271b235f6445fa5fa4bbe7bd1ea87e/junit-platform-commons-1.13.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter/5.13.2/9c1abe3ede704e951fa5329365daa7a4cb444ed5/junit-jupiter-5.13.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter/5.13.2/7962380b91535d6ebdc3bbef30770ede9eea0c54/junit-jupiter-5.13.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.3.0/afb8ff23cffb021c56f333953aebfe6e8818568e/opentest4j-1.3.0-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.3.0/152ea56b3a72f655d4fd677fc0ef2596c3dd5e6e/opentest4j-1.3.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/e0787a997746ac32639e0bf3cb27af8dce8a3428/apiguardian-api-1.1.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/a231e0d844d2721b0fa1b238006d15c6ded6842a/apiguardian-api-1.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.13.2/20ee6ca4924f6bfdc58a29bdffae4bb7c1c9490b/junit-jupiter-engine-5.13.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.13.2/c804035ca0664623283afa3e988414b3dca08d6a/junit-jupiter-engine-5.13.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.13.2/acceb74a45c85e2c5cd70ce373de1f496959df67/junit-platform-engine-1.13.2-sources.jar" kind="lib" path="C:/Users/ethan/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.13.2/ed7187c2ee09d403218ba866f6805939f91bdc26/junit-platform-engine-1.13.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 </classpath>

@@ -53,22 +53,18 @@ public class TaskBayesEval extends Task {
 			}
 			
 			if(resultsCache.isEmpty()) {
-				ResultSet rs = conn.prepareStatement("SELECT results.person_id, results.event_id, competitions.end_date, results.value1, results.value2, results.value3, results.value4, results.value5\r\n"
-						+ "FROM results\r\n"
-						+ "JOIN competitions ON results.competition_id = competitions.id\r\n"
-						+ "ORDER BY person_id, event_id, competitions.end_date ASC").executeQuery();
+				conn.prepareStatement("CREATE INDEX cs_idx_result_attempts_covering ON result_attempts(result_id, value);").executeUpdate();
+				ResultSet rs = conn.prepareStatement("SELECT results.person_id, results.event_id, competitions.end_date, result_attempts.value\r\n"
+						+ "FROM competitions\r\n"
+						+ "JOIN results ON results.competition_id = competitions.id\r\n"
+						+ "JOIN result_attempts ON result_attempts.result_id = results.id\r\n"
+						+ "ORDER BY results.person_id, results.event_id, competitions.end_date;").executeQuery();
 				while(rs.next()) {
 					resultsCache.add(new Result(
 							rs.getString(1),
 							rs.getString(2),
 							rs.getObject(3, LocalDate.class),
-							new int[] {
-								rs.getInt(4),
-								rs.getInt(5),
-								rs.getInt(6),
-								rs.getInt(7),
-								rs.getInt(8)
-							}
+							rs.getInt(4)
 						)
 					);
 				}
@@ -102,21 +98,19 @@ public class TaskBayesEval extends Task {
 				}
 				if(!validEvent) continue;
 				LocalDate date = r.date();
-				for(int i = 4; i <= 8; i++) {
-					int time = r.times()[i-4];
-					if(time > 0 || time == -1) { // Valid time or DNF
-						LogLikelihood ll = getLL(prior, times, dates, dnfs, time);
-						dnfLLSums.put(event, dnfLLSums.getOrDefault(event, 0.0) + ll.dnfPart);
-						timeLLSums.put(event, timeLLSums.getOrDefault(event, 0.0) + ll.timePart);
-						totalLLSums.put(event, totalLLSums.getOrDefault(event, 0.0) + ll.dnfPart + ll.timePart);
-						counts.put(event, counts.getOrDefault(event, 0) + 1);
-					}
-					if(time > 0) {
-						times.add(Math.log(time+0.5));
-						dates.add(date);
-					} else if(time == -1) { // DNF
-						dnfs++;
-					}
+				int time = r.time();
+				if(time > 0 || time == -1) { // Valid time or DNF
+					LogLikelihood ll = getLL(prior, times, dates, dnfs, time);
+					dnfLLSums.put(event, dnfLLSums.getOrDefault(event, 0.0) + ll.dnfPart);
+					timeLLSums.put(event, timeLLSums.getOrDefault(event, 0.0) + ll.timePart);
+					totalLLSums.put(event, totalLLSums.getOrDefault(event, 0.0) + ll.dnfPart + ll.timePart);
+					counts.put(event, counts.getOrDefault(event, 0) + 1);
+				}
+				if(time > 0) {
+					times.add(Math.log(time+0.5));
+					dates.add(date);
+				} else if(time == -1) { // DNF
+					dnfs++;
 				}
 			}
 			
@@ -237,5 +231,5 @@ public class TaskBayesEval extends Task {
 		}
 	}
 	
-	private static record Result(String person, String event, LocalDate date, int[] times) {};
+	private static record Result(String person, String event, LocalDate date, int time) {};
 }
