@@ -161,6 +161,22 @@ public final class Settings {
 				} else if(statusA.equals("empty") && statusB.equals("live")) {
 					settings.liveSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
 					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
+				} else if(statusA.equals("live") && statusB.equals("staging")){
+					System.out.println("Warning: database B is already set to staging. Wiping B and using A as live.");
+					connA.prepareStatement("DROP SCHEMA IF EXISTS " + settings.dbSchemaB + "").executeUpdate();
+					connA.prepareStatement("CREATE SCHEMA " + settings.dbSchemaB).executeUpdate();
+					connA.prepareStatement("CREATE TABLE " + settings.dbSchemaB + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
+					connA.prepareStatement("INSERT INTO " + settings.dbSchemaB + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
+					settings.liveSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
+					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
+				} else if(statusA.equals("staging") && statusB.equals("live")){
+					System.out.println("Warning: database A is already set to staging. Wiping A and using B as live.");
+					connB.prepareStatement("DROP SCHEMA IF EXISTS " + settings.dbSchemaA + "").executeUpdate();
+					connB.prepareStatement("CREATE SCHEMA " + settings.dbSchemaA).executeUpdate();
+					connB.prepareStatement("CREATE TABLE " + settings.dbSchemaA + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
+					connB.prepareStatement("INSERT INTO " + settings.dbSchemaA + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
+					settings.liveSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
+					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
 				} else {
 					System.err.println("Could not autodetect live/staging databases, invalid status values: A='" + statusA + "', B='" + statusB + "'");
 					return false;
