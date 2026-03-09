@@ -23,7 +23,7 @@ public class TaskCSEvents extends Task {
 			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_events").executeUpdate();
-			conn.prepareStatement("CREATE TABLE cs_events AS (SELECT *, TRUE AS is_wca, RANK < 900 AS is_active FROM EVENTS)").executeUpdate();
+			conn.prepareStatement("CREATE TABLE cs_events AS (SELECT *, TRUE AS is_wca, rank < 900 AS is_active FROM events)").executeUpdate();
 			
 			result = new TaskResult(true, "Finished making custom events table");
 			isDone = true;
