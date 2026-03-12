@@ -33,17 +33,27 @@ public class TaskImportWCADatabase extends Task {
 			Process process = pb.start();
 			int exitCode = process.waitFor();
 			if (exitCode != 0) {
+				deleteSQLFile();
 				result = new TaskResult(false, "Importing database dump failed with exit code " + exitCode);
 				isDone = true;
 				return;
 			}
 		} catch (Exception e) {
+			deleteSQLFile();
 			result = new TaskResult(false, "Importing database dump failed: " + e.getMessage());
 			isDone = true;
 			return;
 		}
 		
+		deleteSQLFile();
 		result = new TaskResult(true, "Database dump successfully imported.");
 		isDone = true;
+	}
+	
+	private void deleteSQLFile() {
+		File sqlFile = new File(settings.dataDirectory, "wca-developer-database-dump.sql");
+		if (sqlFile.exists()) {
+			sqlFile.delete();
+		}
 	}
 }
