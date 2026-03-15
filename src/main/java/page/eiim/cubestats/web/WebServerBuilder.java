@@ -86,7 +86,7 @@ public class WebServerBuilder {
 
 		ServerConnector connectorHTTPS = new ServerConnector(server, connections);
 		connectorHTTPS.setPort(443); // TCP port 443
-		connectorHTTPS.setHost("cube-stats.com");
+		connectorHTTPS.setHost(host);
 		server.addConnector(connectorHTTPS);
 	}
 	
