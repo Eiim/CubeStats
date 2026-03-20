@@ -53,10 +53,11 @@ public class TaskBayesUpdate extends Task {
 				));
 			}
 			
-			ResultSet rs = conn.prepareStatement("SELECT results.person_id, results.event_id, competitions.end_date, results.value1, results.value2, results.value3, results.value4, results.value5\r\n"
+			ResultSet rs = conn.prepareStatement("SELECT results.person_id, results.event_id, competitions.end_date, result_attempts.value\r\n"
 					+ "FROM results\r\n"
+					+ "LEFT JOIN result_attempts ON results.id=result_attempts.result_id\r\n"
 					+ "JOIN competitions ON results.competition_id = competitions.id\r\n"
-					+ "ORDER BY person_id, event_id, competitions.end_date ASC").executeQuery();
+					+ "ORDER BY person_id, event_id, competitions.end_date, result_attempts.attempt_number ASC").executeQuery();
 			
 			System.out.println("Getting results...");
 			
@@ -111,14 +112,12 @@ public class TaskBayesUpdate extends Task {
 				}
 				if(!validEvent) continue;
 				LocalDate date = rs.getObject(3, LocalDate.class);
-				for(int i = 4; i <= 8; i++) {
-					int time = rs.getInt(i);
-					if(time > 0) {
-						times.add(Math.log(time));
-						dates.add(date);
-					} else if(time == -1) { // DNF
-						dnfs++;
-					}
+				int time = rs.getInt(4);
+				if(time > 0) {
+					times.add(Math.log(time));
+					dates.add(date);
+				} else if(time == -1) { // DNF
+					dnfs++;
 				}
 			}
 			
