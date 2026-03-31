@@ -16,6 +16,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.tasks.TaskBayesEval.Parameters;
 import page.eiim.cubestats.web.PageBuilder.PersonData;
 import page.eiim.cubestats.web.PageBuilder.ResourceCategory;
@@ -26,8 +27,14 @@ public class PersonHandler extends Handler.Abstract.NonBlocking {
 	private Connection conn;
 	private Set<String> validEventIds = new HashSet<>();
 	
-	public PersonHandler(Connection conn) {
-		this.conn = conn;
+	public PersonHandler() {
+		try {
+			conn = DatabaseConnector.getLiveConnection();
+		} catch (SQLException e) {
+			System.err.println("Failed to connect to database, person pages will not work");
+			e.printStackTrace();
+			return;
+		}
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement("SELECT id, is_wca, is_active FROM cs_events");

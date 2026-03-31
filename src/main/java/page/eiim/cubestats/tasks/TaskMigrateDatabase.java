@@ -3,7 +3,7 @@ package page.eiim.cubestats.tasks;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import page.eiim.cubestats.DatabaseCSN;
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.Settings;
 
 public class TaskMigrateDatabase extends Task {
@@ -19,15 +19,17 @@ public class TaskMigrateDatabase extends Task {
 
 	@Override
 	public void run() {
+		String liveSchema = (DatabaseConnector.getLiveSchema() == DatabaseConnector.DatabaseSchema.A) ? settings.dbSchemaA : settings.dbSchemaB;
+		String stagingSchema = (DatabaseConnector.getLiveSchema() == DatabaseConnector.DatabaseSchema.A) ? settings.dbSchemaB : settings.dbSchemaA;
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
+			Connection conn = DatabaseConnector.getStagingConnection();
 			
-			conn.prepareStatement("DROP SCHEMA IF EXISTS " + liveSchema.name() + "").executeUpdate();
-			conn.prepareStatement("CREATE SCHEMA " + liveSchema.name()).executeUpdate();
-			conn.prepareStatement("CREATE TABLE " + liveSchema.name() + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
-			conn.prepareStatement("INSERT INTO " + liveSchema.name() + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
+			conn.prepareStatement("DROP SCHEMA IF EXISTS " + liveSchema + "").executeUpdate();
+			conn.prepareStatement("CREATE SCHEMA " + liveSchema).executeUpdate();
+			conn.prepareStatement("CREATE TABLE " + liveSchema + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
+			conn.prepareStatement("INSERT INTO " + liveSchema + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
 			
-			conn.prepareStatement("UPDATE " + stagingSchema.name() + ".cs_metadata SET cs_value = \"live\" WHERE cs_key = \"status\"").executeUpdate();
+			conn.prepareStatement("UPDATE " + stagingSchema + ".cs_metadata SET cs_value = \"live\" WHERE cs_key = \"status\"").executeUpdate();
 			
 			result = new TaskResult(true, "Finished migrating database tables");
 			isDone = true;

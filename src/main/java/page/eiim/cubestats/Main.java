@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -94,7 +95,14 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
-		Settings settings = sb.build();
+		Settings settings;
+		try {
+			settings = sb.build();
+		} catch (SQLException e) {
+			System.err.println("Failed to initialize database connection pool, exiting");
+			e.printStackTrace();
+			return;
+		}
 		
 		boolean startedWebserver = false;
 		MainServer server = null;
@@ -140,7 +148,7 @@ public class Main {
 						TaskMigrateDatabase migrateTask = new TaskMigrateDatabase(settings);
 						System.out.println("Migrating database...");
 						migrateTask.run();
-						settings.swapDatabases();
+						DatabaseConnector.swapDatabases();
 						server = new MainServer(settings, networking);
 						server.start();
 						status.set(SystemStatus.NORMAL);

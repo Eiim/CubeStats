@@ -3,7 +3,7 @@ package page.eiim.cubestats.tasks;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import page.eiim.cubestats.DatabaseCSN;
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.Settings;
 
 public class TaskPercentiles extends Task {
@@ -20,7 +20,7 @@ public class TaskPercentiles extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
+			Connection conn = DatabaseConnector.getStagingConnection();
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_pct_single").executeUpdate();
 			conn.prepareStatement("CREATE TABLE cs_pct_single AS (" + """

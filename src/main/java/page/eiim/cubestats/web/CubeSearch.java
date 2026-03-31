@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 
+import page.eiim.cubestats.DatabaseConnector;
+
 public class CubeSearch {
 
 	private TreeSet<String> eventIds;
@@ -15,7 +17,7 @@ public class CubeSearch {
 	private WordStorage wordStoragePersons;
 	private WordStorage wordStorageCompetitions;
 	
-	public CubeSearch(Connection conn) throws SQLException {
+	public CubeSearch() throws SQLException {
 		eventIds = new TreeSet<>();
 		competitionIds = new TreeSet<>();
 		personIds = new TreeSet<>();
@@ -24,6 +26,7 @@ public class CubeSearch {
 		List<String> personIdsList = new ArrayList<>();
 		List<String> competitionIdsList = new ArrayList<>();
 		
+		Connection conn = DatabaseConnector.getLiveConnection();
 		var stmt = conn.createStatement();
 		var rs = stmt.executeQuery("SELECT id FROM events");
 		while(rs.next()) {
@@ -146,8 +149,7 @@ public class CubeSearch {
 	public static void main(String[] args) {
 		CubeSearch cs;
 		try {
-			Connection conn = DatabaseConnector.getConnection("cubestats", "cubing", "jdbc:mariadb://localhost:3306/cs_b");
-			cs = new CubeSearch(conn);
+			cs = new CubeSearch();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

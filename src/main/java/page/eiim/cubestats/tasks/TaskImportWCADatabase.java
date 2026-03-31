@@ -2,6 +2,7 @@ package page.eiim.cubestats.tasks;
 
 import java.io.File;
 
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.Settings;
 
 public class TaskImportWCADatabase extends Task {
@@ -25,7 +26,7 @@ public class TaskImportWCADatabase extends Task {
 				"-P", Integer.toString(settings.dbPort),
 				"-u", settings.dbUserName,
 				"-p" + settings.dbPassword,
-				stagingSchema.name()
+				(DatabaseConnector.getLiveSchema() == DatabaseConnector.DatabaseSchema.A ? settings.dbSchemaB : settings.dbSchemaA)
 		);
 		pb.directory(settings.dataDirectory);
 		pb.redirectInput(new File(settings.dataDirectory, "wca-developer-database-dump.sql"));

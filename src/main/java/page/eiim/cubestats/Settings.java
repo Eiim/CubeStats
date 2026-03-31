@@ -2,8 +2,6 @@ package page.eiim.cubestats;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public final class Settings {
@@ -22,13 +20,11 @@ public final class Settings {
 	public final String dbPassword;
 	public final String dbHost;
 	public final int dbPort;
-	public DatabaseSchema liveSchema;
-	public DatabaseSchema stagingSchema;
 	
-	private final String dbSchemaA;
-	private final String dbSchemaB;
-	private final String dbUrlA;
-	private final String dbUrlB;
+	public final String dbSchemaA;
+	public final String dbSchemaB;
+	public final String dbUrlA;
+	public final String dbUrlB;
 	
 	public final Charset importCharset;
 	
@@ -77,12 +73,6 @@ public final class Settings {
 		}
 	}
 	
-	public void swapDatabases() {
-		DatabaseSchema temp = liveSchema;
-		liveSchema = stagingSchema;
-		stagingSchema = temp;
-	}
-	
 	public static class Builder {
 		public boolean noImport = false;
 		public boolean noWebserver = false;
@@ -102,7 +92,6 @@ public final class Settings {
 		public String dbSchemaB = "cs_b";
 		public String dbUrlA = null;
 		public String dbUrlB = null;
-		public SchemaAB liveSchema = null;
 		
 		public Charset importCharset = Charset.forName("UTF-8");
 		
@@ -114,83 +103,11 @@ public final class Settings {
 		
 		public Builder() {}
 		
-		public Settings build() {
+		public Settings build() throws SQLException {
 			Settings s = new Settings(this);
-			if(liveSchema == null)  {
-				if(autodetectLiveStaging(s)) {
-					// Correctly set by autodetectLiveStaging
-				} else {
-					throw new IllegalStateException("Live/staging databases could not be autodetected, please set cs_metadata tables");
-				}
-			}
+			DatabaseConnector.initialize(s.dbUserName, s.dbPassword, s.dbUrlA, s.dbUrlB, s.dbSchemaA, s.dbSchemaB);
 			return s;
 		}
-	}
-	
-	public enum SchemaAB {
-		A, B;
-		
-		public static SchemaAB fromString(String s) {
-			if(s.equalsIgnoreCase("A")) {
-				return A;
-			} else if(s.equalsIgnoreCase("B")) {
-				return B;
-			} else {
-				throw new IllegalArgumentException("Invalid SchemaAB string: " + s);
-			}
-		}
-	
-		public SchemaAB opposite() {
-			return this == A ? B : A;
-		}
-	}
-	
-	public static boolean autodetectLiveStaging(Settings settings) {
-		try {
-			Connection connA = DatabaseCSN.getConnection(settings, new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA));
-			Connection connB = DatabaseCSN.getConnection(settings, new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB));
-			ResultSet rsA = connA.prepareStatement("SELECT cs_value FROM cs_metadata WHERE cs_key = \"status\"").executeQuery();
-			ResultSet rsB = connB.prepareStatement("SELECT cs_value FROM cs_metadata WHERE cs_key = \"status\"").executeQuery();
-			
-			if(rsA.next() && rsB.next()) {
-				String statusA = rsA.getString(1);
-				String statusB = rsB.getString(1);
-				if(statusA.equals("live") && statusB.equals("empty")) {
-					settings.liveSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
-					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
-				} else if(statusA.equals("empty") && statusB.equals("live")) {
-					settings.liveSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
-					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
-				} else if(statusA.equals("live") && statusB.equals("staging")){
-					System.out.println("Warning: database B is already set to staging. Wiping B and using A as live.");
-					connA.prepareStatement("DROP SCHEMA IF EXISTS " + settings.dbSchemaB + "").executeUpdate();
-					connA.prepareStatement("CREATE SCHEMA " + settings.dbSchemaB).executeUpdate();
-					connA.prepareStatement("CREATE TABLE " + settings.dbSchemaB + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
-					connA.prepareStatement("INSERT INTO " + settings.dbSchemaB + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
-					settings.liveSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
-					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
-				} else if(statusA.equals("staging") && statusB.equals("live")){
-					System.out.println("Warning: database A is already set to staging. Wiping A and using B as live.");
-					connB.prepareStatement("DROP SCHEMA IF EXISTS " + settings.dbSchemaA + "").executeUpdate();
-					connB.prepareStatement("CREATE SCHEMA " + settings.dbSchemaA).executeUpdate();
-					connB.prepareStatement("CREATE TABLE " + settings.dbSchemaA + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
-					connB.prepareStatement("INSERT INTO " + settings.dbSchemaA + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
-					settings.liveSchema = new DatabaseSchema(settings.dbSchemaB, settings.dbUrlB);
-					settings.stagingSchema = new DatabaseSchema(settings.dbSchemaA, settings.dbUrlA);
-				} else {
-					System.err.println("Could not autodetect live/staging databases, invalid status values: A='" + statusA + "', B='" + statusB + "'");
-					return false;
-				}
-			} else {
-				System.err.println("Could not autodetect live/staging databases, missing metadata 'status' key");
-				return false;
-			}
-		} catch (SQLException e) {
-			System.err.println("SQL error during live/staging autodetection: " + e.getMessage());
-			return false;
-		}
-		
-		return true;
 	}
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import page.eiim.cubestats.DatabaseCSN;
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.Settings;
 
 public class TaskBayesUpdate extends Task {
@@ -31,7 +31,7 @@ public class TaskBayesUpdate extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
+			Connection conn = DatabaseConnector.getStagingConnection();
 			conn.setAutoCommit(false);
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_bayes_params").executeUpdate();

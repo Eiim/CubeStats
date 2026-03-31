@@ -68,11 +68,11 @@ public class MainServer {
 		ContextHandlerCollection contextHandlers = new ContextHandlerCollection();
 		
 		try {
-			CubeSearch cubeSearch = new CubeSearch(DatabaseConnector.getConnection(settings.dbUserName, settings.dbPassword, settings.liveSchema.url()));
+			CubeSearch cubeSearch = new CubeSearch();
 			ContextHandler searchHandler = new ContextHandler(new SearchHandler(cubeSearch), "/searchapi");
 			searchHandler.setAllowNullPathInContext(true);
 			contextHandlers.addHandler(searchHandler);
-			PersonHandler personHandler = new PersonHandler(DatabaseConnector.getConnection(settings.dbUserName, settings.dbPassword, settings.liveSchema.url()));
+			PersonHandler personHandler = new PersonHandler();
 			ContextHandler cph = new ContextHandler(personHandler, "/person");
 			contextHandlers.addHandler(cph);
 		} catch (SQLException e) {

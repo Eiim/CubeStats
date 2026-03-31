@@ -3,7 +3,7 @@ package page.eiim.cubestats.tasks;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import page.eiim.cubestats.DatabaseCSN;
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.Settings;
 
 public class TaskCSEvents extends Task {
@@ -20,7 +20,7 @@ public class TaskCSEvents extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
+			Connection conn = DatabaseConnector.getStagingConnection();
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_events").executeUpdate();
 			conn.prepareStatement("CREATE TABLE cs_events AS (SELECT *, TRUE AS is_wca, rank < 900 AS is_active FROM events)").executeUpdate();

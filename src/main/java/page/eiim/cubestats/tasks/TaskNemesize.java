@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import page.eiim.cubestats.DatabaseCSN;
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.Settings;
 
 public class TaskNemesize extends Task {
@@ -24,7 +24,7 @@ public class TaskNemesize extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
+			Connection conn = DatabaseConnector.getStagingConnection();
 			
 			conn.prepareStatement("DROP TABLE IF EXISTS cs_nemeses").executeUpdate();
 			conn.prepareStatement("CREATE TABLE cs_nemeses (nemesizer INT NOT NULL, nemesizee INT NOT NULL)").executeUpdate();

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import page.eiim.cubestats.DatabaseCSN;
+import page.eiim.cubestats.DatabaseConnector;
 import page.eiim.cubestats.DistrMath;
 import page.eiim.cubestats.Settings;
 
@@ -33,7 +33,7 @@ public class TaskBayesEval extends Task {
 	@Override
 	public void run() {
 		try {
-			Connection conn = DatabaseCSN.getConnection(settings, stagingSchema);
+			Connection conn = DatabaseConnector.getStagingConnection();
 			
 			if(priors.isEmpty()) {
 				ResultSet rsEvents = conn.prepareStatement("SELECT event_id, mu_a_0, m_0, alpha_0, theta_0, alep_0, bet_0 FROM cs_bayes_priors").executeQuery();
@@ -217,7 +217,14 @@ public class TaskBayesEval extends Task {
 	
 	public static void main(String[] args) {
 		Settings.Builder sb = new Settings.Builder();
-		Settings settings = sb.build();
+		Settings settings;
+		try {
+			settings = sb.build();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
 		Task task;
 		if(false) {
 			task = new TaskBayesPriors(settings);
