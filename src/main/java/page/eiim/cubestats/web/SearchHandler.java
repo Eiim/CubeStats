@@ -82,6 +82,14 @@ public class SearchHandler extends Handler.Abstract.NonBlocking {
 			redirectURL = true;
 			form = "wca_url";
 		}
+		if("cs".equals(form)) {
+			redirectURL = true;
+			form = "cs_url";
+		}
+		if("cs_url".equals(form)) { // Temporary override until we have these pages
+			includeCompetitions = false;
+			includeEvents = false;
+		}
 		
 		boolean eventAverage = false;
 		boolean eventRecords = false;
@@ -125,6 +133,27 @@ public class SearchHandler extends Handler.Abstract.NonBlocking {
 								sb.append("https://www.worldcubeassociation.org/results/rankings/").append(r.result()).append("/single");
 							}
 						}
+					};
+					
+					if(i < results.size() - 1) {
+						sb.append('\n');
+					}
+				}
+				
+				yield sb.toString();
+			}
+			case "cs_url" -> {
+				if(results.size() == 0) {
+					yield "https://cube-stats.com/";
+				}
+				
+				StringBuilder sb = new StringBuilder();
+				for(int i = 0; i < results.size(); i++) {
+					QueryResult r = results.get(i);
+					switch(r.type()) {
+						case PERSON -> sb.append("https://cube-stats.com/person/").append(r.result());
+						case COMPETITION -> sb.append("https://cube-stats.com/competition/").append(r.result());
+						case EVENT -> sb.append("https://cube-stats.com/event/").append(r.result());
 					};
 					
 					if(i < results.size() - 1) {
