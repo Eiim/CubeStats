@@ -12,7 +12,17 @@ public class DatabaseConnector {
 	private static MariaDbPoolDataSource dataSourceB;
 	private static DatabaseSchema liveSchema;
 	
+	private static String user;
+	private static String password;
+	private static String urlA;
+	private static String urlB;
+	
 	public static void initialize(String user, String password, String urlA, String urlB, String schemaA, String schemaB) throws SQLException {
+		DatabaseConnector.user = user;
+		DatabaseConnector.password = password;
+		DatabaseConnector.urlA = urlA;
+		DatabaseConnector.urlB = urlB;
+		
 		dataSourceA = new MariaDbPoolDataSource();
 		dataSourceA.setUser(user);
 		dataSourceA.setPassword(password);
@@ -39,15 +49,17 @@ public class DatabaseConnector {
 				System.out.println("Warning: database B is already set to staging. Wiping B and using A as live.");
 				connA.prepareStatement("DROP SCHEMA IF EXISTS " + schemaA + "").executeUpdate();
 				connA.prepareStatement("CREATE SCHEMA " + schemaA).executeUpdate();
-				connA.prepareStatement("CREATE TABLE " + schemaA + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
-				connA.prepareStatement("INSERT INTO " + schemaA + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
+				connA.prepareStatement("USE " + schemaA).executeUpdate();
+				connA.prepareStatement("CREATE TABLE cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
+				connA.prepareStatement("INSERT INTO cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
 				liveSchema = DatabaseSchema.A;
 			} else if(statusA.equals("staging") && statusB.equals("live")){
 				System.out.println("Warning: database A is already set to staging. Wiping A and using B as live.");
 				connB.prepareStatement("DROP SCHEMA IF EXISTS " + schemaB + "").executeUpdate();
 				connB.prepareStatement("CREATE SCHEMA " + schemaB).executeUpdate();
-				connB.prepareStatement("CREATE TABLE " + schemaB + ".cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
-				connB.prepareStatement("INSERT INTO " + schemaB + ".cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
+				connB.prepareStatement("USE " + schemaB).executeUpdate();
+				connB.prepareStatement("CREATE TABLE cs_metadata (cs_key VARCHAR(255) PRIMARY KEY, cs_value VARCHAR(255))").executeUpdate();
+				connB.prepareStatement("INSERT INTO cs_metadata (cs_key, cs_value) VALUES ('status', 'empty')").executeUpdate();
 				liveSchema = DatabaseSchema.B;
 			} else {
 				System.err.println("Could not autodetect live/staging databases, invalid status values: A='" + statusA + "', B='" + statusB + "'");
@@ -67,7 +79,20 @@ public class DatabaseConnector {
 		return liveSchema == DatabaseSchema.A ? dataSourceB.getConnection() : dataSourceA.getConnection();
 	}
 	
-	public static void swapDatabases() {
+	public static void swapDatabases() throws SQLException {
+		dataSourceA.close();
+		dataSourceB.close();
+		
+		dataSourceA = new MariaDbPoolDataSource();
+		dataSourceA.setUser(user);
+		dataSourceA.setPassword(password);
+		dataSourceA.setUrl(urlA);
+		
+		dataSourceB = new MariaDbPoolDataSource();
+		dataSourceB.setUser(user);
+		dataSourceB.setPassword(password);
+		dataSourceB.setUrl(urlB);
+		
 		liveSchema = (liveSchema == DatabaseSchema.A) ? DatabaseSchema.B : DatabaseSchema.A;
 	}
 	

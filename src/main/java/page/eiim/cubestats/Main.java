@@ -159,6 +159,10 @@ public class Main {
 				}
 				Thread.sleep(60 * 1000); // Check for update every minute
 			} catch (InterruptedException e) {
+				System.err.println("Main thread interrupted");
+				e.printStackTrace();
+			} catch (SQLException e) {
+				System.err.println("Failed to swap databases, attempting to continue");
 				e.printStackTrace();
 			}
 		}
