@@ -110,7 +110,7 @@ public class PersonHandler extends Handler.Abstract.NonBlocking {
 			eventParams.put(eventId, params);
 		}
 		
-		PersonData pd = new PersonData(personId, personName, personURL, eventParams);
+		PersonData pd = new PersonData(personName, personId, personURL, eventParams);
 		
 		PageBuilder.Instance pb = PageBuilder.getInstance(pd);
 		String html = pb
