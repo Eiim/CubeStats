@@ -62,7 +62,15 @@ public class PersonHandler extends Handler.Abstract.NonBlocking {
 		String personId = path.substring(8, 18).toUpperCase();
 		
 		String personName = null;
-		PreparedStatement ps1 = conn.prepareStatement("SELECT name, wca_id FROM persons WHERE wca_id=? ORDER BY sub_id DESC LIMIT 1");
+		PreparedStatement ps1;
+		try {
+			ps1 = conn.prepareStatement("SELECT name, wca_id FROM persons WHERE wca_id=? ORDER BY sub_id DESC LIMIT 1");
+		} catch (SQLException e) {
+			// Connection might have been lost, try to reconnect and prepare statement again
+			conn.close();
+			conn = DatabaseConnector.getLiveConnection();
+			ps1 = conn.prepareStatement("SELECT name, wca_id FROM persons WHERE wca_id=? ORDER BY sub_id DESC LIMIT 1");
+		}
 		ps1.setString(1, personId);
 		ResultSet rs1 = ps1.executeQuery();
 		if(!rs1.next()) {
