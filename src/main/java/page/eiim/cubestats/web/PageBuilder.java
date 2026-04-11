@@ -30,12 +30,15 @@ public class PageBuilder {
 		
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(resourcesRoot, "index.html")))) {
 			writer.write(new Instance()
-					.buildHead("CubeStats", "Some statistical analysis of WCA cubing results: under construction", ResourceCategory.NONE)
+					.buildHead("CubeStats", "Some statistical analysis of WCA cubing results: under construction", ResourceCategory.INDEX)
 					.addSidebar()
 					.startBody()
 					.addLogo()
 					.enterMain()
-					.addRawHTML("<h1 style=\"margin-top:180px\">Coming soon!</h1>")
+					.addRawHTML("<div id=\"searchContainer\">\n"
+							+ "	<form id=\"mainSearchForm\"><input type=\"search\" id=\"mainSearch\" name=\"mainSearch\"/></form>\n"
+							+ "	<div id=\"mainSearchPopup\"></div>\n"
+							+ "</div>\n")
 					.signAndClose()
 					.build());
 		} catch (Exception e) {
@@ -176,9 +179,14 @@ public class PageBuilder {
 			
 			switch(category) {
 				case NONE -> {}
-				case BLOG -> sb.append("<link rel=\"stylesheet\" href=\"/blog.css\">\n");
+				case BLOG -> {
+					sb.append("<link rel=\"stylesheet\" href=\"/blog.css\">\n");
+				}
 				case PERSON -> {
 					sb.append("<link rel=\"stylesheet\" href=\"/person.css\">\n<script src=\"/tcdf.js\"></script>\n<script src=\"/person.js\"></script>\n");
+				}
+				case INDEX -> {
+					sb.append("<link rel=\"stylesheet\" href=\"/index.css\">\n<script src=\"/index.js\"></script>");
 				}
 			}
 			sb.append("</head>\n<body>\n");
@@ -306,7 +314,7 @@ public class PageBuilder {
 	}
 	
 	public static enum ResourceCategory {
-		NONE, BLOG, PERSON;
+		NONE, BLOG, PERSON, INDEX;
 	}
 	
 	public static record PersonData(String name, String wcaID, String avatarURL, Map<String, Parameters> eventParams) {}

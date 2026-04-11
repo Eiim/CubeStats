@@ -138,4 +138,11 @@ body {
 #bodyContainer {
 	flex: 1;
 	margin: 8px;
+	position: relative;
+}
+footer {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
 }

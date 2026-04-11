@@ -1,0 +1,39 @@
+#searchContainer {
+	position: relative;
+	width: 450px;
+	margin: auto;
+}
+#mainSearch, #mainSearchPopup {
+	font-size: x-large;
+	background-color: var(--background-secondary);
+	color: var(--text-primary);
+	padding: 5px;
+	border: 2px solid var(--button-secondary);
+	border-radius: 5px;
+}
+#mainSearch {
+	width: 100%;
+}
+#mainSearchPopup {
+	display: none;
+	width: calc(100% - 4px);
+	position: absolute;
+	top: 100%;
+	margin: auto;
+	margin-top: 5px;
+	padding-left: 0;
+	padding-right: 0;
+}
+.mainSearchResult {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+#mainSearchPopup > a + a > .mainSearchResult {
+	border-top: 2px solid var(--button-secondary);
+}
+#mainSearchPopup > a:first-child > .mainSearchResult {
+	padding-top: 2px;
+}
+#mainSearchPopup > a:last-child > .mainSearchResult {
+	padding-bottom: 2px;
+}
