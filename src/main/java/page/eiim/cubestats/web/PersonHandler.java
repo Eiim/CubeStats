@@ -24,19 +24,10 @@ import page.eiim.cubestats.web.PageBuilder.ResourceCategory;
 public class PersonHandler extends Handler.Abstract.NonBlocking {
 	
 	private static final Charset UTF8 = Charset.forName("UTF-8");
-	private Connection conn;
 	private Set<String> validEventIds = new HashSet<>();
 	
 	public PersonHandler() {
-		try {
-			conn = DatabaseConnector.getLiveConnection();
-		} catch (SQLException e) {
-			System.err.println("Failed to connect to database, person pages will not work");
-			e.printStackTrace();
-			return;
-		}
-		
-		try {
+		try(Connection conn = DatabaseConnector.getLiveConnection()) {
 			PreparedStatement ps = conn.prepareStatement("SELECT id, is_wca, is_active FROM cs_events");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()) {
@@ -53,24 +44,18 @@ public class PersonHandler extends Handler.Abstract.NonBlocking {
 	}
 	
 	@Override
-	public boolean handle(Request request, Response response, Callback callback) throws Exception {
+	public boolean handle(Request request, Response response, Callback callback) throws SQLException {
 		String path = request.getHttpURI().getPath();
 		if(!path.startsWith("/person/") || !(path.length() == 18)) {
 			return false;
 		}
 		
 		String personId = path.substring(8, 18).toUpperCase();
-		
 		String personName = null;
-		PreparedStatement ps1;
-		try {
-			ps1 = conn.prepareStatement("SELECT name, wca_id FROM persons WHERE wca_id=? ORDER BY sub_id DESC LIMIT 1");
-		} catch (SQLException e) {
-			// Connection might have been lost, try to reconnect and prepare statement again
-			conn.close();
-			conn = DatabaseConnector.getLiveConnection();
-			ps1 = conn.prepareStatement("SELECT name, wca_id FROM persons WHERE wca_id=? ORDER BY sub_id DESC LIMIT 1");
-		}
+		
+		Connection conn = DatabaseConnector.getLiveConnection();
+		
+		PreparedStatement ps1 = conn.prepareStatement("SELECT name, wca_id FROM persons WHERE wca_id=? ORDER BY sub_id DESC LIMIT 1");
 		ps1.setString(1, personId);
 		ResultSet rs1 = ps1.executeQuery();
 		if(!rs1.next()) {
